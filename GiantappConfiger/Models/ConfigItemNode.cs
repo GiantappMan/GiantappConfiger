@@ -5,23 +5,23 @@ namespace GiantappConfiger.Models
     /// <summary>
     /// 表示一个数据节点，UI左侧
     /// </summary>
-    public class NodeInfo : Base
+    public class ConfigItemNode : _ObservableObject
     {
         #region properties
         
         #region Children
 
         /// <summary>
-        /// The <see cref="Children" /> property's name.
+        /// The <see cref="SubNodes" /> property's name.
         /// </summary>
         public const string ChildrenPropertyName = "Children";
 
-        private ObservableCollection<NodeInfo> _Children;
+        private ObservableCollection<ConfigItemNode> _Children;
 
         /// <summary>
         /// 子节点
         /// </summary>
-        public ObservableCollection<NodeInfo> Children
+        public ObservableCollection<ConfigItemNode> SubNodes
         {
             get { return _Children; }
 
@@ -43,12 +43,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string PropertiesPropertyName = "Properties";
 
-        private ObservableCollection<PropertyInfo> _Properties;
+        private ObservableCollection<ConfigItemProperty> _Properties;
 
         /// <summary>
         /// 该节点包含的属性
         /// </summary>
-        public ObservableCollection<PropertyInfo> Properties
+        public ObservableCollection<ConfigItemProperty> Properties
         {
             get { return _Properties; }
 
@@ -85,6 +85,33 @@ namespace GiantappConfiger.Models
 
                 _Selected = value;
                 NotifyOfPropertyChange(SelectedPropertyName);
+            }
+        }
+
+        #endregion
+
+        #region Descriptor
+
+        /// <summary>
+        /// The <see cref="Descriptor" /> property's name.
+        /// </summary>
+        public const string DescriptorPropertyName = "Descriptor";
+
+        private Descriptor _Descriptor;
+
+        /// <summary>
+        /// 描述信息
+        /// </summary>
+        public Descriptor Descriptor
+        {
+            get { return _Descriptor; }
+
+            set
+            {
+                if (_Descriptor == value) return;
+
+                _Descriptor = value;
+                NotifyOfPropertyChange(DescriptorPropertyName);
             }
         }
 

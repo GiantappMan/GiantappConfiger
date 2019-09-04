@@ -16,35 +16,8 @@ namespace GiantappConfiger.Models
     /// <summary>
     /// 表示一个可填的字段，界面右边
     /// </summary>
-    public class PropertyInfo : Base
+    public class ConfigItemProperty : _ObservableObject
     {
-        #region Type
-
-        /// <summary>
-        /// The <see cref="Type" /> property's name.
-        /// </summary>
-        public const string TypePropertyName = "Type";
-
-        private PropertyType _Type;
-
-        /// <summary>
-        /// CType
-        /// </summary>
-        public PropertyType Type
-        {
-            get { return _Type; }
-
-            set
-            {
-                if (_Type == value) return;
-
-                _Type = value;
-                NotifyOfPropertyChange(TypePropertyName);
-            }
-        }
-
-        #endregion
-
         #region Value
 
         /// <summary>
@@ -79,12 +52,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string OptionsPropertyName = "Options";
 
-        private List<PropertyInfo> _Options;
+        private List<ConfigItemProperty> _Options;
 
         /// <summary>
         /// 表示当前字段的可选择项
         /// </summary>
-        public List<PropertyInfo> Options
+        public List<ConfigItemProperty> Options
         {
             get { return _Options; }
 
@@ -106,12 +79,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string SelectedPropertyName = "Selected";
 
-        private PropertyInfo _Selected;
+        private ConfigItemProperty _Selected;
 
         /// <summary>
         /// Selected
         /// </summary>
-        public PropertyInfo Selected
+        public ConfigItemProperty Selected
         {
             get { return _Selected; }
 
@@ -129,5 +102,33 @@ namespace GiantappConfiger.Models
         }
 
         #endregion
+
+        #region Descriptor
+
+        /// <summary>
+        /// The <see cref="Descriptor" /> property's name.
+        /// </summary>
+        public const string DescriptorPropertyName = "Descriptor";
+
+        private Descriptor _Descriptor;
+
+        /// <summary>
+        /// 描述信息
+        /// </summary>
+        public Descriptor Descriptor
+        {
+            get { return _Descriptor; }
+
+            set
+            {
+                if (_Descriptor == value) return;
+
+                _Descriptor = value;
+                NotifyOfPropertyChange(DescriptorPropertyName);
+            }
+        }
+
+        #endregion
+
     }
 }

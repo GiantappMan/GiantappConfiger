@@ -74,7 +74,7 @@ namespace Sample.WPF
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var vm = control.DataContext as ConfierViewModel;
+            var vm = control.DataContext as ConfigerViewModel;
             var data = service.GetData(vm.Nodes);
             _ = await JsonHelper.JsonSerializeAsync(data, path);
         }

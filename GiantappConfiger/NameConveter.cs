@@ -11,34 +11,32 @@ namespace GiantappConfiger
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Base)
+            if (value is Descriptor d)
             {
-                Base cp = value as Base;
-
                 if (ReadDesc)
                 {
-                    if (!string.IsNullOrEmpty(cp.Desc))
-                        return cp.Desc;
+                    if (!string.IsNullOrEmpty(d.Desc))
+                        return d.Desc;
 
-                    if (!string.IsNullOrEmpty(cp.DescLanKey))
+                    if (!string.IsNullOrEmpty(d.DescKey))
                     {
-                        string lan = LanService.Get(cp.DescLanKey).Result;
+                        string lan = LanService.Get(d.DescKey).Result;
                         return lan;
                     }
                     return null;
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(cp.Lan))
-                        return cp.Lan;
+                    if (!string.IsNullOrEmpty(d.Text))
+                        return d.Text;
 
-                    if (!string.IsNullOrEmpty(cp.LanKey))
+                    if (!string.IsNullOrEmpty(d.Text))
                     {
-                        string lan = LanService.Get(cp.LanKey).Result;
+                        string lan = LanService.Get(d.TextKey).Result;
                         return lan;
                     }
                 }
-                return cp.Name;
+                return d.Name;
             }
 
             return value;

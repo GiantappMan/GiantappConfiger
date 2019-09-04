@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace GiantappConfiger
 {
@@ -18,6 +22,12 @@ namespace GiantappConfiger
         {
             _injectedDescOjbs[key] = descObjs;
         }
+        public static T DeepClone<T>(T obj)
+        {
+            var json = JsonConvert.SerializeObject(obj);
+            var type = obj.GetType();
+            return (T)JsonConvert.DeserializeObject(json, type);
+        }
 
         /// <summary>
         /// 和默认配置对比，如果缺失则补上
@@ -25,38 +35,47 @@ namespace GiantappConfiger
         /// <param name="data"></param>
         /// <param name="defaultData"></param>
         /// <returns></returns>
-        public static JToken CheckDefault(JObject data, JObject defaultData)
+        public static object CheckDefault(object data, Descriptor defaultData)
         {
-            var result = JToken.FromObject(new object());
-            if (data != null)
-                result = data.DeepClone();
-            foreach (var x in defaultData)
-            {
-                var tmpValue = result[x.Key];
-                var defaultValue = defaultData[x.Key];
-                if (tmpValue == null)
+            if (data == null)
+                return null;
+            var result = DeepClone(data);
+            var properties = result.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            if (properties != null)
+                foreach (var pItem in properties)
                 {
-                    result[x.Key] = defaultValue;
+                    var currentPropertyValue = pItem.GetValue(result);
+                    if (currentPropertyValue == null && defaultData.SumbItems.ContainsKey(pItem.Name))
+                    {
+                        var descriptor = defaultData.SumbItems[pItem.Name];
+                        if (descriptor != null)
+                        {
+                            pItem.SetValue(result, descriptor.DefaultValue);
+                            currentPropertyValue = descriptor.DefaultValue;
+                        }
+
+                        if (descriptor.SumbItems != null)
+                        {
+                            currentPropertyValue = CheckDefault(currentPropertyValue, descriptor);
+                            pItem.SetValue(result, currentPropertyValue);
+                        }
+                    }
                 }
-                else if (!(tmpValue is JValue))
-                {
-                    result[x.Key] = CheckDefault(tmpValue as JObject, defaultValue as JObject);
-                }
-            }
             return result;
         }
 
-        public ConfierViewModel GetVM(object config, Base descConfig)
+        public ConfigerViewModel GetVM(object config, Descriptor descConfig)
         {
-            var vm = new ConfierViewModel
+            config = CheckDefault(config, descConfig);
+            var vm = new ConfigerViewModel
             {
-                Nodes = ResolveJson(config, descConfig).Nodes
+                Nodes = GetNodes(config, descConfig)
             };
             vm.Nodes[0].Selected = true;
             return vm;
         }
 
-        public UserControl GetView(object config, Base desc)
+        public UserControl GetView(object config, Descriptor desc)
         {
             var control = new ConfigControl
             {
@@ -65,172 +84,145 @@ namespace GiantappConfiger
             return control;
         }
 
-        public object GetData(ObservableCollection<NodeInfo> nodes)
+        public object GetData(ObservableCollection<ConfigItemNode> nodes)
         {
             var result = new ExpandoObject() as IDictionary<string, object>;
             foreach (var nodeItem in nodes)
             {
                 var tempNodeObj = GetDataFromNode(nodeItem);
 
-                foreach (var subNode in nodeItem.Children)
+                foreach (var subNode in nodeItem.SubNodes)
                 {
                     var subNodeObj = GetDataFromNode(subNode);
-                    tempNodeObj.Add(subNode.Name, subNodeObj);
+                    tempNodeObj.Add(subNode.Descriptor.Name, subNodeObj);
                 }
-                result.Add(nodeItem.Name, tempNodeObj);
+                result.Add(nodeItem.Descriptor.Name, tempNodeObj);
             }
             return result;
         }
 
         #region private
 
-        private IDictionary<string, object> GetDataFromNode(NodeInfo nodeItem)
+        private IDictionary<string, object> GetDataFromNode(ConfigItemNode nodeItem)
         {
             var tempNodeObj = new ExpandoObject() as IDictionary<string, object>;
             foreach (var propertyItem in nodeItem.Properties)
             {
-                tempNodeObj.Add(propertyItem.Name, propertyItem.Value);
+                tempNodeObj.Add(propertyItem.Descriptor.Name, propertyItem.Value);
             }
             return tempNodeObj;
         }
 
-        private void FillObj(Base property, Base descInfo)
+        private ObservableCollection<ConfigItemNode> GetNodes(object data, Descriptor descriptor)
         {
-            property.Lan = descInfo.Lan;
-            property.LanKey = descInfo.LanKey;
-            property.Desc = descInfo.Desc;
-            property.DescLanKey = descInfo.DescLanKey;
-        }
-
-        private PropertyInfo ConverterToNodeProperty(JValue value)
-        {
-            if (value == null)
+            var configNodes = new ObservableCollection<ConfigItemNode>();
+            if (data == null)
                 return null;
 
-            PropertyInfo result = new PropertyInfo
+            bool isValue = IsValue(data.GetType());
+            if (!isValue)
             {
-                Value = value.Value
-            };
-            bool ok = Enum.TryParse(value.Type.ToString(), out PropertyType Type);
-            if (ok)
-                result.Type = Type;
-            return result;
-        }
-
-        private (ObservableCollection<NodeInfo> Nodes, ObservableCollection<PropertyInfo> Properties) ResolveJson(object data, Base descObj)
-        {
-            var childNodes = new ObservableCollection<NodeInfo>();
-            var properties = new ObservableCollection<PropertyInfo>();
-            if (data == null)
-                return (childNodes, properties);
-
-            dynamic descInfo = null;
-            foreach (var x in data)
-            {
-                if (descObj != null)
-                    descInfo = descObj[x.Key];
-
-                descInfo = ConveterJnjectData(descInfo);
-
-                if (x.Value is JValue)
+                var tmpProperties = new ObservableCollection<ConfigItemProperty>();
+                var node = new ConfigItemNode();
+                if (descriptor != null)
                 {
-                    var value = x.Value as JValue;
-                    PropertyInfo property = ConverterToNodeProperty(value);
-                    if (property == null)
-                        continue;
-
-                    if (descInfo != null)
-                    {
-                        bool ok = Enum.TryParse(descInfo.type.ToString(), true, out PropertyType cType);
-                        if (ok)
-                            property.Type = cType;
-
-                        FillObj(property, descInfo);
-
-                        if (descInfo.cbItems != null)
-                        {
-                            var tempList = new List<PropertyInfo>();
-                            foreach (var item in descInfo.cbItems)
-                            {
-                                var tmp = new PropertyInfo();
-                                FillObj(tmp, item);
-                                tmp.Value = item.value.ToString();
-                                tempList.Add(tmp);
-                            }
-                            property.Options = tempList;
-                            property.Selected = tempList.FirstOrDefault
-                                (m => m.Value != null && property.Value != null
-                                && m.Value.ToString() == property.Value.ToString());
-                        }
-                    }
-
-                    property.Name = x.Key;
-
-                    if (property != null)
-                        properties.Add(property);
+                    var tmp = DeepClone(descriptor);
+                    //只需要保留当前级的信息，节约内存
+                    tmp.SumbItems = null;
+                    node.Descriptor = tmp;
                 }
                 else
+                    descriptor = new Descriptor() { Text = data.GetType().Name };
+
+                configNodes.Add(node);
+
+                var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+                foreach (var pType in properties)
                 {
-                    var node = new NodeInfo();
-                    if (descInfo != null)
+                    Descriptor subDescriptor = null;
+                    if (descriptor.SumbItems.ContainsKey(pType.Name))
                     {
-                        FillObj(node, descInfo);
+                        subDescriptor = descriptor.SumbItems[pType.Name];
                     }
-                    node.Name = x.Key;
+                    else
+                        subDescriptor = new Descriptor() { Text = pType.Name };
+                    var property = new ConfigItemProperty
+                    {
+                        Descriptor = subDescriptor
+                    };
 
-                    var (Nodes, Properties) = ResolveJson(x.Value as JObject, descInfo as JObject);
-                    node.Children = Nodes;
-                    node.Properties = Properties;
-                    childNodes.Add(node);
+                    isValue = IsValue(pType.PropertyType);
+                    if (isValue)
+                    {
+                        var currentValue = pType.GetValue(data);
+                        property.Value = currentValue;
+                        if (property != null)
+                            tmpProperties.Add(property);
+                    }
+                    else
+                    {
+                        if (property.Value == null)
+                        {
+                            //子对象
+                            property.Value = Activator.CreateInstance(pType.PropertyType);
+                            if (node.SubNodes == null)
+                                node.SubNodes = new ObservableCollection<ConfigItemNode>();
+
+                            var subNodes = GetNodes(property.Value, subDescriptor);
+                            if (subNodes != null)
+                                node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
+                        }
+                    }
                 }
+                node.Properties = tmpProperties;
             }
 
-            return (childNodes, properties);
+            return configNodes;
+
+            //Descriptor descriptor = null;
+            //properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            //foreach (var x in properties)
+            //{
+            //    if (descObj != null && descObj.SumbItems.ContainsKey(x.Name))
+            //        descriptor = descObj.SumbItems[x.Name];
+
+            //    var currentValue = x.GetValue(data);
+            //    //isValue = IsValue(x);
+            //    if (currentValue != null && isValue)
+            //    {
+            //        var property = new ConfigItemProperty();
+            //        property.Descriptor = descriptor;
+            //        property.Value = currentValue;
+            //        if (property != null)
+            //            configProperties.Add(property);
+            //    }
+            //    else
+            //    {
+            //        var node = new ConfigItemNode();
+            //        if (descriptor != null)
+            //        {
+            //            var tmp = DeepClone(descriptor);
+            //            //只需要保留当前级的信息，节约内存
+            //            tmp.SumbItems = null;
+            //            node.Descriptor = tmp;
+            //        }
+
+            //        var Nodes = Resolve(currentValue, descriptor);
+            //        node.Children = Nodes;
+            //        configNodes.Add(node);
+            //    }
+            //}
+
+            //return configNodes;
         }
 
-        private dynamic ConveterJnjectData(JToken descInfo)
+        private bool IsValue(Type type)
         {
-            if (descInfo == null) return null;
-
-            foreach (JProperty item in descInfo)
-            {
-                string tmpValue = item?.Value.ToString();
-                if (tmpValue.StartsWith("$"))
-                {
-                    item.Value = JToken.FromObject(_injectedDescOjbs[tmpValue]);
-                }
-            }
-
-            return descInfo;
+            //var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            //return properties.Length > 0;
+            return type.IsPrimitive || type.Equals(typeof(string));
         }
 
-        #endregion
-
-        #region Obsolete
-
-        [Obsolete]
-        public ConfierViewModel GetVM(object config, object descConfig)
-        {
-            if (!(config is JObject json))
-                return null;
-
-            var vm = new ConfierViewModel
-            {
-                Nodes = ResolveJson(config as JObject, descConfig as JObject).Nodes
-            };
-            vm.Nodes[0].Selected = true;
-            return vm;
-        }
-
-        [Obsolete]
-        public UserControl GetView(object config, object desc)
-        {
-            var control = new ConfigControl
-            {
-                DataContext = GetVM(config, desc)
-            };
-            return control;
-        }
         #endregion
     }
 }
