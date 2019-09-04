@@ -1,6 +1,6 @@
 ﻿using GiantappConfiger.Models;
 using System.Windows.Controls;
-using GiantappConfiger.WPF;
+using GiantappConfiger;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace GiantappConfiger
 {
-    public class JCrService
+    public class ConfigerService
     {
         private readonly Dictionary<string, List<dynamic>> _injectedDescOjbs = new Dictionary<string, List<dynamic>>();
 
@@ -46,9 +46,9 @@ namespace GiantappConfiger
             return result;
         }
 
-        public JsonConfierViewModel GetVM(JObject config, JObject descConfig)
+        public ConfierViewModel GetVM(JObject config, JObject descConfig)
         {
-            var vm = new JsonConfierViewModel
+            var vm = new ConfierViewModel
             {
                 Nodes = ResolveJson(config, descConfig).Nodes
             };
@@ -58,7 +58,7 @@ namespace GiantappConfiger
 
         public UserControl GetView(JObject config, JObject desc)
         {
-            var control = new JsonConfierControl
+            var control = new ConfierControl
             {
                 DataContext = GetVM(config, desc)
             };
@@ -200,10 +200,7 @@ namespace GiantappConfiger
                 {
                     item.Value = JToken.FromObject(_injectedDescOjbs[tmpValue]);
                 }
-                //item.Value()
             }
-            //if (descInfo == null && _injectedDescOjbs.ContainsKey(x.Key))
-            //    descInfo = _injectedDescOjbs[x.Key];
 
             return descInfo;
         }
@@ -213,12 +210,12 @@ namespace GiantappConfiger
         #region Obsolete
 
         [Obsolete]
-        public JsonConfierViewModel GetVM(object config, object descConfig)
+        public ConfierViewModel GetVM(object config, object descConfig)
         {
             if (!(config is JObject json))
                 return null;
 
-            var vm = new JsonConfierViewModel
+            var vm = new ConfierViewModel
             {
                 Nodes = ResolveJson(config as JObject, descConfig as JObject).Nodes
             };
@@ -229,7 +226,7 @@ namespace GiantappConfiger
         [Obsolete]
         public UserControl GetView(object config, object desc)
         {
-            var control = new JsonConfierControl
+            var control = new ConfierControl
             {
                 DataContext = GetVM(config, desc)
             };

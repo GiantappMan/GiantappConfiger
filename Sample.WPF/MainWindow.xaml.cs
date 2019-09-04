@@ -25,7 +25,7 @@ namespace Sample.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        JCrService service = new JCrService();
+        readonly ConfigerService service = new ConfigerService();
         UserControl control;
         readonly string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.json");
         readonly string defaultPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.default.json");
@@ -64,7 +64,7 @@ namespace Sample.WPF
 
             service.InjectDescObjs("$screen", extraDescObjs);
 
-            data = JCrService.CheckDefault(data as JObject, defaultData as JObject);
+            data = ConfigerService.CheckDefault(data as JObject, defaultData as JObject);
 
             control = service.GetView(data as JObject, dataDesc as JObject);
             control.BorderBrush = new SolidColorBrush(Colors.Red);
@@ -74,7 +74,7 @@ namespace Sample.WPF
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var vm = control.DataContext as JsonConfierViewModel;
+            var vm = control.DataContext as ConfierViewModel;
             var data = service.GetData(vm.Nodes);
             _ = await JsonHelper.JsonSerializeAsync(data, path);
         }

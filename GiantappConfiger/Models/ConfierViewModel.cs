@@ -2,7 +2,7 @@
 
 namespace GiantappConfiger.Models
 {
-    public class JsonConfierViewModel : ObservableObject
+    public class ConfierViewModel : ObservableObject
     {
         #region properties
 

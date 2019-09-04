@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace GiantappConfiger.WPF.ValidationRules
+namespace GiantappConfiger.ValidationRules
 {
     public enum LimitType
     {

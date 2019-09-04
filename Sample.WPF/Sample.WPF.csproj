@@ -15,8 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GiantappConfiger.WPF\GiantappConfiger.WPF.csproj" />
-    <ProjectReference Include="..\JsonConfiger.WPF\GiantappConfiger.WPF.csproj" />
+    <ProjectReference Include="..\GiantappConfiger\GiantappConfiger.csproj" />
   </ItemGroup>
 
   <ItemGroup>
