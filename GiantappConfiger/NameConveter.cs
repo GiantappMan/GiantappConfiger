@@ -11,9 +11,9 @@ namespace GiantappConfiger
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is CBaseObj)
+            if (value is Base)
             {
-                CBaseObj cp = value as CBaseObj;
+                Base cp = value as Base;
 
                 if (ReadDesc)
                 {

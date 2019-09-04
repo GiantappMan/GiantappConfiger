@@ -46,7 +46,7 @@ namespace GiantappConfiger
             return result;
         }
 
-        public ConfierViewModel GetVM(JObject config, JObject descConfig)
+        public ConfierViewModel GetVM(object config, Base descConfig)
         {
             var vm = new ConfierViewModel
             {
@@ -56,7 +56,7 @@ namespace GiantappConfiger
             return vm;
         }
 
-        public UserControl GetView(JObject config, JObject desc)
+        public UserControl GetView(object config, Base desc)
         {
             var control = new ConfigControl
             {
@@ -65,7 +65,7 @@ namespace GiantappConfiger
             return control;
         }
 
-        public object GetData(ObservableCollection<CNode> nodes)
+        public object GetData(ObservableCollection<NodeInfo> nodes)
         {
             var result = new ExpandoObject() as IDictionary<string, object>;
             foreach (var nodeItem in nodes)
@@ -84,7 +84,7 @@ namespace GiantappConfiger
 
         #region private
 
-        private IDictionary<string, object> GetDataFromNode(CNode nodeItem)
+        private IDictionary<string, object> GetDataFromNode(NodeInfo nodeItem)
         {
             var tempNodeObj = new ExpandoObject() as IDictionary<string, object>;
             foreach (var propertyItem in nodeItem.Properties)
@@ -94,34 +94,33 @@ namespace GiantappConfiger
             return tempNodeObj;
         }
 
-        private void FillObj(CBaseObj property, dynamic descInfo)
+        private void FillObj(Base property, Base descInfo)
         {
-            property.Lan = descInfo.lan;
-            property.LanKey = descInfo.lanKey;
-            property.Desc = descInfo.desc;
-            property.DescLanKey = descInfo.descLanKey;
-            property.UID = descInfo.uid;
+            property.Lan = descInfo.Lan;
+            property.LanKey = descInfo.LanKey;
+            property.Desc = descInfo.Desc;
+            property.DescLanKey = descInfo.DescLanKey;
         }
 
-        private CProperty ConverterToNodeProperty(JValue value)
+        private PropertyInfo ConverterToNodeProperty(JValue value)
         {
             if (value == null)
                 return null;
 
-            CProperty result = new CProperty
+            PropertyInfo result = new PropertyInfo
             {
                 Value = value.Value
             };
-            bool ok = Enum.TryParse(value.Type.ToString(), out CPropertyType Type);
+            bool ok = Enum.TryParse(value.Type.ToString(), out PropertyType Type);
             if (ok)
-                result.CType = Type;
+                result.Type = Type;
             return result;
         }
 
-        private (ObservableCollection<CNode> Nodes, ObservableCollection<CProperty> Properties) ResolveJson(JObject data, JObject descObj)
+        private (ObservableCollection<NodeInfo> Nodes, ObservableCollection<PropertyInfo> Properties) ResolveJson(object data, Base descObj)
         {
-            var childNodes = new ObservableCollection<CNode>();
-            var properties = new ObservableCollection<CProperty>();
+            var childNodes = new ObservableCollection<NodeInfo>();
+            var properties = new ObservableCollection<PropertyInfo>();
             if (data == null)
                 return (childNodes, properties);
 
@@ -136,29 +135,29 @@ namespace GiantappConfiger
                 if (x.Value is JValue)
                 {
                     var value = x.Value as JValue;
-                    CProperty property = ConverterToNodeProperty(value);
+                    PropertyInfo property = ConverterToNodeProperty(value);
                     if (property == null)
                         continue;
 
                     if (descInfo != null)
                     {
-                        bool ok = Enum.TryParse(descInfo.type.ToString(), true, out CPropertyType cType);
+                        bool ok = Enum.TryParse(descInfo.type.ToString(), true, out PropertyType cType);
                         if (ok)
-                            property.CType = cType;
+                            property.Type = cType;
 
                         FillObj(property, descInfo);
 
                         if (descInfo.cbItems != null)
                         {
-                            var tempList = new List<CProperty>();
+                            var tempList = new List<PropertyInfo>();
                             foreach (var item in descInfo.cbItems)
                             {
-                                var tmp = new CProperty();
+                                var tmp = new PropertyInfo();
                                 FillObj(tmp, item);
                                 tmp.Value = item.value.ToString();
                                 tempList.Add(tmp);
                             }
-                            property.ItemsSource = tempList;
+                            property.Options = tempList;
                             property.Selected = tempList.FirstOrDefault
                                 (m => m.Value != null && property.Value != null
                                 && m.Value.ToString() == property.Value.ToString());
@@ -172,7 +171,7 @@ namespace GiantappConfiger
                 }
                 else
                 {
-                    var node = new CNode();
+                    var node = new NodeInfo();
                     if (descInfo != null)
                     {
                         FillObj(node, descInfo);

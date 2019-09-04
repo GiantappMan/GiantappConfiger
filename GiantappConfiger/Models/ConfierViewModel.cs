@@ -2,7 +2,7 @@
 
 namespace GiantappConfiger.Models
 {
-    public class ConfierViewModel : ObservableObject
+    public class ConfierViewModel : _ObservableObject
     {
         #region properties
 
@@ -13,12 +13,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string NodesPropertyName = "Nodes";
 
-        private ObservableCollection<CNode> _Nodes;
+        private ObservableCollection<NodeInfo> _Nodes;
 
         /// <summary>
         /// Nodes
         /// </summary>
-        public ObservableCollection<CNode> Nodes
+        public ObservableCollection<NodeInfo> Nodes
         {
             get { return _Nodes; }
 

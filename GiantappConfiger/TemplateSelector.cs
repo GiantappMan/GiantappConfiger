@@ -7,12 +7,12 @@ namespace GiantappConfiger
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (!(item is CProperty cp))
+            if (!(item is PropertyInfo cp))
             {
                 return null;
             }
 
-            string key = $"{cp.CType.ToString()}Editor";
+            string key = $"{cp.Type.ToString()}Editor";
             var template = ((FrameworkElement)container).FindResource(key) as DataTemplate;
             return template;
         }

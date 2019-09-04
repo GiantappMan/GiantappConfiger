@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GiantappConfiger.Models
 {
-    public enum CPropertyType
+    public enum PropertyType
     {
         Integer,
         Float,
@@ -13,30 +13,33 @@ namespace GiantappConfiger.Models
         Combobox
     }
 
-    public class CProperty : CBaseObj
+    /// <summary>
+    /// 表示一个可填的字段，界面右边
+    /// </summary>
+    public class PropertyInfo : Base
     {
-        #region CType
+        #region Type
 
         /// <summary>
-        /// The <see cref="CType" /> property's name.
+        /// The <see cref="Type" /> property's name.
         /// </summary>
-        public const string CTypePropertyName = "CType";
+        public const string TypePropertyName = "Type";
 
-        private CPropertyType _CType;
+        private PropertyType _Type;
 
         /// <summary>
         /// CType
         /// </summary>
-        public CPropertyType CType
+        public PropertyType Type
         {
-            get { return _CType; }
+            get { return _Type; }
 
             set
             {
-                if (_CType == value) return;
+                if (_Type == value) return;
 
-                _CType = value;
-                NotifyOfPropertyChange(CTypePropertyName);
+                _Type = value;
+                NotifyOfPropertyChange(TypePropertyName);
             }
         }
 
@@ -69,28 +72,28 @@ namespace GiantappConfiger.Models
 
         #endregion
 
-        #region ItemsSource
+        #region Options
 
         /// <summary>
-        /// The <see cref="ItemsSource" /> property's name.
+        /// The <see cref="Options" /> property's name.
         /// </summary>
-        public const string ItemsSourcePropertyName = "ItemsSource";
+        public const string OptionsPropertyName = "Options";
 
-        private List<CProperty> _ItemsSource;
+        private List<PropertyInfo> _Options;
 
         /// <summary>
-        /// ItemsSource
+        /// 表示当前字段的可选择项
         /// </summary>
-        public List<CProperty> ItemsSource
+        public List<PropertyInfo> Options
         {
-            get { return _ItemsSource; }
+            get { return _Options; }
 
             set
             {
-                if (_ItemsSource == value) return;
+                if (_Options == value) return;
 
-                _ItemsSource = value;
-                NotifyOfPropertyChange(ItemsSourcePropertyName);
+                _Options = value;
+                NotifyOfPropertyChange(OptionsPropertyName);
             }
         }
 
@@ -103,12 +106,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string SelectedPropertyName = "Selected";
 
-        private CProperty _Selected;
+        private PropertyInfo _Selected;
 
         /// <summary>
         /// Selected
         /// </summary>
-        public CProperty Selected
+        public PropertyInfo Selected
         {
             get { return _Selected; }
 

@@ -2,10 +2,13 @@
 
 namespace GiantappConfiger.Models
 {
-    public class CNode : CBaseObj
+    /// <summary>
+    /// 表示一个数据节点，UI左侧
+    /// </summary>
+    public class NodeInfo : Base
     {
         #region properties
-
+        
         #region Children
 
         /// <summary>
@@ -13,12 +16,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string ChildrenPropertyName = "Children";
 
-        private ObservableCollection<CNode> _Children;
+        private ObservableCollection<NodeInfo> _Children;
 
         /// <summary>
-        /// Children
+        /// 子节点
         /// </summary>
-        public ObservableCollection<CNode> Children
+        public ObservableCollection<NodeInfo> Children
         {
             get { return _Children; }
 
@@ -40,12 +43,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string PropertiesPropertyName = "Properties";
 
-        private ObservableCollection<CProperty> _Properties;
+        private ObservableCollection<PropertyInfo> _Properties;
 
         /// <summary>
-        /// Properties
+        /// 该节点包含的属性
         /// </summary>
-        public ObservableCollection<CProperty> Properties
+        public ObservableCollection<PropertyInfo> Properties
         {
             get { return _Properties; }
 
@@ -70,7 +73,7 @@ namespace GiantappConfiger.Models
         private bool _Selected;
 
         /// <summary>
-        /// Selected
+        /// 节点是否选中
         /// </summary>
         public bool Selected
         {

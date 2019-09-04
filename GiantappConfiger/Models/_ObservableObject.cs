@@ -2,7 +2,7 @@
 
 namespace GiantappConfiger.Models
 {
-    public class ObservableObject : INotifyPropertyChanged
+    public class _ObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyOfPropertyChange(string propertyName)

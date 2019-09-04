@@ -1,6 +1,6 @@
 ﻿namespace GiantappConfiger.Models
 {
-    public class CBaseObj : ObservableObject
+    public class Base : _ObservableObject
     {
         #region Name
 
@@ -39,7 +39,7 @@
         private string _Lan;
 
         /// <summary>
-        /// Lan
+        /// 文本内容
         /// </summary>
         public string Lan
         {
@@ -93,7 +93,7 @@
         private string _Desc;
 
         /// <summary>
-        /// Desc
+        /// 描述 用于tooltip显示之类的
         /// </summary>
         public string Desc
         {
@@ -120,7 +120,7 @@
         private string _DescLanKey;
 
         /// <summary>
-        /// DescLanKey
+        /// 描述多语言key
         /// </summary>
         public string DescLanKey
         {
@@ -132,33 +132,6 @@
 
                 _DescLanKey = value;
                 NotifyOfPropertyChange(DescLanKeyPropertyName);
-            }
-        }
-
-        #endregion
-
-        #region UID
-
-        /// <summary>
-        /// The <see cref="UID" /> property's name.
-        /// </summary>
-        public const string UIDPropertyName = "UID";
-
-        private string _UID;
-
-        /// <summary>
-        /// UID  UWP专用
-        /// </summary>
-        public string UID
-        {
-            get { return _UID; }
-
-            set
-            {
-                if (_UID == value) return;
-
-                _UID = value;
-                NotifyOfPropertyChange(UIDPropertyName);
             }
         }
 
