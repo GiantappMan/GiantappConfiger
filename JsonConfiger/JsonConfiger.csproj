@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="WPF\Editors.xaml" />
+    <None Remove="WPF\JsonConfierControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DZY.DotNetUtil" Version="2.0.0" />
+    <PackageReference Include="Microsoft.WindowsDesktop.App" Version="3.0.0-preview5-27626-15" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.0.11" />
+    <PackageReference Include="MultiLanguageForXAML" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="WPF\Editors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="WPF\JsonConfierControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+</Project>

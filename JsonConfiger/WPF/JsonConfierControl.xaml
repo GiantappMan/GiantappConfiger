@@ -1,0 +1,54 @@
+﻿<UserControl
+    x:Class="JsonConfiger.WPF.JsonConfierControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:JsonConfiger.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:JsonConfiger.Models"
+    x:Name="usercontrol"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Editors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Column0Width, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:JsonConfierControl}}" />
+            <ColumnDefinition Width="{Binding Column1Width, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:JsonConfierControl}}" />
+        </Grid.ColumnDefinitions>
+        <TreeView
+            x:Name="tree"
+            Margin="5"
+            Padding="10"
+            BorderBrush="{Binding ElementName=usercontrol, Path=BorderBrush}"
+            BorderThickness="1"
+            ItemsSource="{Binding Nodes, Mode=OneWay}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsSelected" Value="{Binding Selected}" />
+                    <Setter Property="IsExpanded" Value="{Binding Selected}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type models:CNode}" ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Converter={StaticResource NameConveter}}" ToolTip="{Binding DescLanKey}" />
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <ItemsControl
+            Grid.Column="1"
+            Margin="5"
+            Padding="15"
+            HorizontalContentAlignment="Stretch"
+            BorderBrush="{Binding ElementName=tree, Path=BorderBrush}"
+            BorderThickness="1"
+            ItemTemplateSelector="{StaticResource TemplateSelector}"
+            ItemsSource="{Binding ElementName=tree, Path=SelectedItem.Properties, Mode=OneWay}" />
+    </Grid>
+</UserControl>

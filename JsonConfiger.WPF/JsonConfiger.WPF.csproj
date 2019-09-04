@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>net47;netcoreapp3.0</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>JsonConfiger</AssemblyName>
+    <RootNamespace>JsonConfiger</RootNamespace>
+    <Version>1.0.1</Version>
+    <PackageId>JsonConfiger.WPF</PackageId>
+    <Authors>DaZiYuan</Authors>
+    <Product>巨应工作室 | GiantApp Studio</Product>
+    <Description>mscoder.cn</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\Output\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\Output\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MultiLanguageForXAML" Version="2.0.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JsonConfiger.Common\JsonConfiger.Common.csproj" />
+  </ItemGroup>
+
+
+</Project>

@@ -1,0 +1,59 @@
+﻿{
+  "setting": {
+    "lan": "setting3333333333333333333333333333333333333",
+    "uid": "local_wallpaper",
+    "s1": {
+      "type": "Boolean",
+      "lan": "布尔值11111111111111111112222222222222222222222222221",
+      "desc": "描述"
+    },
+    "s2": {
+      "type": "string",
+      "lan": "s2---------111111111111111111122222222222222222222222222233333333331",
+      "uid": "local_wallpaper"
+    },
+    "s3": {
+      "type": "combobox",
+      "lan": "下拉框",
+      "cbItems": [
+        {
+          "lan": "中文",
+          "value": "zh"
+        },
+        {
+          "lan": "English",
+          "value": "en"
+        }
+      ]
+    },
+    "s4": {
+      "type": "string",
+      "lan": "xxx"
+    },
+    "ts": {
+      "type": "timespan",
+      "lan": "ts"
+    },
+    "custom": {
+      "c1": {
+        "type": "integer",
+        "lan": "xxx"
+      },
+      "c2": {
+        "type": "string",
+        "lan": "xxx"
+      },
+      "c3": {
+        "type": "string",
+        "lan": "xxx"
+      }
+    }
+  },
+  "setting2": {
+    "test": {
+      "lan": "代码注入",
+      "type": "combobox",
+      "cbItems": "$screen"
+    }
+  }
+}
