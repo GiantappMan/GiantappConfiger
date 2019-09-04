@@ -1,6 +1,6 @@
 ﻿using DZY.Util.Common.Helpers;
-using JsonConfiger;
-using JsonConfiger.Models;
+using GiantappConfiger;
+using GiantappConfiger.Models;
 using MultiLanguageForXAML;
 using Newtonsoft.Json.Linq;
 using System;
