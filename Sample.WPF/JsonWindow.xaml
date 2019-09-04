@@ -1,5 +1,5 @@
 ﻿<Window
-    x:Class="Sample.WPF.MainWindow"
+    x:Class="Sample.WPF.JsonWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,8 +9,12 @@
     Width="800"
     Height="450"
     mc:Ignorable="d">
-    <StackPanel>
-        <Button Click="btnClass_Click">Class</Button>
-        <Button Click="btnJson_Click" >Json</Button>
-    </StackPanel>
+    <Grid x:Name="grid">
+        <Button
+            Width="50"
+            Height="20"
+            Click="Button_Click">
+            Save
+        </Button>
+    </Grid>
 </Window>

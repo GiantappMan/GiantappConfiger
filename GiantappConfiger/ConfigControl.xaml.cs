@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GiantappConfiger
@@ -6,11 +7,16 @@ namespace GiantappConfiger
     /// <summary>
     /// Interaction logic for JsonConfierControl.xaml
     /// </summary>
-    public partial class ConfierControl : UserControl
+    public partial class ConfigControl : UserControl
     {
-        public ConfierControl()
+        public ConfigControl()
         {
             InitializeComponent();
+        }
+
+        public void Init(object obj)
+        {
+            throw new NotImplementedException();
         }
 
         public string Column0Width
@@ -21,7 +27,7 @@ namespace GiantappConfiger
 
         // Using a DependencyProperty as the backing store for Column0Width.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty Column0WidthProperty =
-            DependencyProperty.Register("Column0Width", typeof(string), typeof(ConfierControl), new PropertyMetadata("1*"));
+            DependencyProperty.Register("Column0Width", typeof(string), typeof(ConfigControl), new PropertyMetadata("1*"));
 
         public string Column1Width
         {
@@ -31,6 +37,6 @@ namespace GiantappConfiger
 
         // Using a DependencyProperty as the backing store for Column1Width.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty Column1WidthProperty =
-            DependencyProperty.Register("Column1Width", typeof(string), typeof(ConfierControl), new PropertyMetadata("4*"));
+            DependencyProperty.Register("Column1Width", typeof(string), typeof(ConfigControl), new PropertyMetadata("4*"));
     }
 }

@@ -58,7 +58,7 @@ namespace GiantappConfiger
 
         public UserControl GetView(JObject config, JObject desc)
         {
-            var control = new ConfierControl
+            var control = new ConfigControl
             {
                 DataContext = GetVM(config, desc)
             };
@@ -226,7 +226,7 @@ namespace GiantappConfiger
         [Obsolete]
         public UserControl GetView(object config, object desc)
         {
-            var control = new ConfierControl
+            var control = new ConfigControl
             {
                 DataContext = GetVM(config, desc)
             };
