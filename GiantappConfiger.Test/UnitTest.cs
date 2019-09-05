@@ -47,7 +47,7 @@ namespace GiantappConfiger.Test
                     },
                 }
             };
-            setting = (TestSetting)ConfigerService.CheckDefault(setting, descriptor);
+            //setting = (TestSetting)ConfigerService.CheckDefault(setting, descriptor);
             Assert.IsTrue(setting.P1 == 1);
             Assert.IsTrue(setting.P2 == "xxx");
             Assert.IsTrue(setting.P3 == true);

@@ -3,6 +3,7 @@ using GiantappConfiger;
 using GiantappConfiger.Models;
 using MultiLanguageForXAML;
 using Newtonsoft.Json.Linq;
+using Sample.WPF.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,10 +43,8 @@ namespace Sample.WPF
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var data = await JsonHelper.JsonDeserializeFromFileAsync<object>(path);
-            var defaultData = await JsonHelper.JsonDeserializeFromFileAsync<object>(defaultPath);
-            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<object>(descPath);
-
+            var data = await JsonHelper.JsonDeserializeFromFileAsync<Setting>(path);
+            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<Descriptor>(descPath);
             List<dynamic> extraDescObjs = new List<dynamic>();
 
             extraDescObjs.Add(new
@@ -61,13 +60,7 @@ namespace Sample.WPF
                     value = i
                 });
             }
-
-            service.InjectDescObjs("$screen", extraDescObjs);
-
-            data = ConfigerService.CheckDefault(data as JObject, defaultData as JObject);
-
-            control = service.GetView(data as JObject, dataDesc as JObject);
-            control.BorderBrush = new SolidColorBrush(Colors.Red);
+            control = service.GetView(data, dataDesc);
 
             grid.Children.Insert(0, control);
         }
