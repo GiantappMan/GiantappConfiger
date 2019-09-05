@@ -44,7 +44,7 @@ namespace Sample.WPF
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var data = await JsonHelper.JsonDeserializeFromFileAsync<Setting>(path);
-            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<Descriptor>(descPath);
+            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<DescriptorInfo>(descPath);
             List<dynamic> extraDescObjs = new List<dynamic>();
 
             extraDescObjs.Add(new

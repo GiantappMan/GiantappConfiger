@@ -97,12 +97,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string DescriptorPropertyName = "Descriptor";
 
-        private Descriptor _Descriptor;
+        private DescriptorInfo _Descriptor;
 
         /// <summary>
         /// 描述信息
         /// </summary>
-        public Descriptor Descriptor
+        public DescriptorInfo Descriptor
         {
             get { return _Descriptor; }
 

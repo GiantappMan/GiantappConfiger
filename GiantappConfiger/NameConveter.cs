@@ -11,7 +11,7 @@ namespace GiantappConfiger
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Descriptor d = null;
+            DescriptorInfo d = null;
             if (value is ConfigItemNode node)
                 d = node.Descriptor;
             if (value is ConfigItemProperty property)

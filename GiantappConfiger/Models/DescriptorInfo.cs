@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GiantappConfiger.Models
 {
     /// <summary>
     /// 用于描述配置字段
     /// </summary>
-    public class Descriptor: _ObservableObject
+    public class DescriptorInfo : _ObservableObject
     {
         #region Name
 
@@ -208,13 +204,13 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string OptionsPropertyName = "Options";
 
-        private ObservableCollection<Descriptor> _Options;
+        private ObservableCollection<DescriptorInfo> _Options;
 
         /// <summary>
         /// 
         /// 
         /// </summary>
-        public ObservableCollection<Descriptor> Options
+        public ObservableCollection<DescriptorInfo> Options
         {
             get { return _Options; }
 
@@ -232,16 +228,16 @@ namespace GiantappConfiger.Models
         #region SumbItems
 
         /// <summary>
-        /// The <see cref="SumbItems" /> property's name.
+        /// The <see cref="SumbDescriptorInfo" /> property's name.
         /// </summary>
         public const string SumbItemsPropertyName = "SumbItems";
 
-        private Dictionary<string, Descriptor> _SumbItems;
+        private Dictionary<string, DescriptorInfo> _SumbItems;
 
         /// <summary>
         /// 子集描述对象
         /// </summary>
-        public Dictionary<string, Descriptor> SumbItems
+        public Dictionary<string, DescriptorInfo> SumbDescriptorInfo
         {
             get { return _SumbItems; }
 

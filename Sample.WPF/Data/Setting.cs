@@ -13,6 +13,7 @@ namespace Sample.WPF.Data
         public string C3 { get; set; }
     }
 
+    [Descriptor(Text = "test")]
     public class Setting
     {
         public string S1 { get; set; }

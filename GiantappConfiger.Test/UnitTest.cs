@@ -5,18 +5,26 @@ using System.Reflection;
 
 namespace GiantappConfiger.Test
 {
+    [Descriptor(Text = "≤‚ ‘")]
     class TestSetting
     {
+        [Descriptor(Text = "≤‚ ‘1")]
         public int P1 { get; set; }
+        [Descriptor(Text = "≤‚ ‘2", DefaultValue = "xxx")]
         public string P2 { get; set; }
+        [Descriptor(Text = "≤‚ ‘3")]
         public bool P3 { get; set; }
+        [Descriptor(Text = "≤‚ ‘4")]
         public string P4 { get; set; }
+        [Descriptor(Text = "≤‚ ‘5")]
         public SubSetting SubSetting { get; set; }
     }
 
     class SubSetting
     {
+        [Descriptor(Text = "≤‚ ‘6")]
         public string SP1 { get; set; }
+        [Descriptor(Text = "≤‚ ‘7", DefaultValue = "ooo")]
         public string SP2 { get; set; }
     }
 
@@ -24,8 +32,9 @@ namespace GiantappConfiger.Test
     public class UnitTest
     {
         [TestMethod]
-        public void TestCheckDefault()
+        public void TestGetVMFromAttribute()
         {
+            ConfigerService service = new ConfigerService();
             TestSetting setting = new TestSetting()
             {
                 P1 = 1,
@@ -33,27 +42,14 @@ namespace GiantappConfiger.Test
                 P3 = true
             };
 
-            var descriptor = new Descriptor()
-            {
-                SumbItems = new Dictionary<string, Descriptor>() {
-                    {"P1", new Descriptor(){ Text="int property"} },
-                    {"P2", new Descriptor(){ Text="string property",DefaultValue="xxx"} },
-                    {"SubSetting", new Descriptor(){ Text="string property",DefaultValue=new SubSetting(),
-                        SumbItems=new Dictionary<string, Descriptor>()
-                        {
-                            {"SP1", new Descriptor(){ Text="sub int property"} },
-                            {"SP2", new Descriptor(){ Text="sub string property",DefaultValue="ooo"} }
-                        }}
-                    },
-                }
-            };
-            //setting = (TestSetting)ConfigerService.CheckDefault(setting, descriptor);
-            Assert.IsTrue(setting.P1 == 1);
-            Assert.IsTrue(setting.P2 == "xxx");
-            Assert.IsTrue(setting.P3 == true);
-            Assert.IsTrue(setting.P4 == null);
-            Assert.IsTrue(setting.SubSetting.SP1 == null);
-            Assert.IsTrue(setting.SubSetting.SP2 == "ooo");
+            var vm = service.GetVM(setting);
+            Assert.IsTrue(vm.Nodes.Count == 1);
+            Assert.IsTrue(vm.Nodes[0].Selected);
+            Assert.IsTrue(vm.Nodes[0].Properties.Count == 4);
+            Assert.IsTrue(vm.Nodes[0].Descriptor.Text == "node 0");
+            var p1 = vm.Nodes[0].Properties[0];
+            Assert.IsTrue(p1.Descriptor.Text == "int property");
+            Assert.IsTrue((int)p1.Value == 1);
         }
 
         [TestMethod]
@@ -67,17 +63,17 @@ namespace GiantappConfiger.Test
                 P3 = true
             };
 
-            var descriptor = new Descriptor()
+            var descriptor = new DescriptorInfo()
             {
                 Text = "node 0",
-                SumbItems = new Dictionary<string, Descriptor>() {
-                    {"P1", new Descriptor(){ Text="int property"} },
-                    {"P2", new Descriptor(){ Text="string property",DefaultValue="xxx"} },
-                    {"SubSetting", new Descriptor(){ Text="string property",DefaultValue=new SubSetting(),
-                        SumbItems=new Dictionary<string, Descriptor>()
+                SumbDescriptorInfo = new Dictionary<string, DescriptorInfo>() {
+                    {"P1", new DescriptorInfo(){ Text="int property"} },
+                    {"P2", new DescriptorInfo(){ Text="string property",DefaultValue="xxx"} },
+                    {"SubSetting", new DescriptorInfo(){ Text="string property",DefaultValue=new SubSetting(),
+                        SumbDescriptorInfo=new Dictionary<string, DescriptorInfo>()
                         {
-                            {"SP1", new Descriptor(){ Text="sub int property"} },
-                            {"SP2", new Descriptor(){ Text="sub string property",DefaultValue="ooo"} }
+                            {"SP1", new DescriptorInfo(){ Text="sub int property"} },
+                            {"SP2", new DescriptorInfo(){ Text="sub string property",DefaultValue="ooo"} }
                         }}
                     },
                 }
