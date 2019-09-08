@@ -45,32 +45,32 @@ namespace GiantappConfiger.Models
 
         #endregion
 
-        #region Options
+        //#region Options
 
-        /// <summary>
-        /// The <see cref="Options" /> property's name.
-        /// </summary>
-        public const string OptionsPropertyName = "Options";
+        ///// <summary>
+        ///// The <see cref="Options" /> property's name.
+        ///// </summary>
+        //public const string OptionsPropertyName = "Options";
 
-        private List<ConfigItemProperty> _Options;
+        //private List<ConfigItemProperty> _Options;
 
-        /// <summary>
-        /// 表示当前字段的可选择项
-        /// </summary>
-        public List<ConfigItemProperty> Options
-        {
-            get { return _Options; }
+        ///// <summary>
+        ///// 表示当前字段的可选择项
+        ///// </summary>
+        //public List<ConfigItemProperty> Options
+        //{
+        //    get { return _Options; }
 
-            set
-            {
-                if (_Options == value) return;
+        //    set
+        //    {
+        //        if (_Options == value) return;
 
-                _Options = value;
-                NotifyOfPropertyChange(OptionsPropertyName);
-            }
-        }
+        //        _Options = value;
+        //        NotifyOfPropertyChange(OptionsPropertyName);
+        //    }
+        //}
 
-        #endregion
+        //#endregion
 
         #region Selected
 

@@ -11,6 +11,15 @@ namespace GiantappConfiger.Models
     /// </summary>
     public class DescriptorInfo : _ObservableObject
     {
+        public static void SetPropertyName(string name, DescriptorInfo info)
+        {
+            info.PropertyName = name;
+        }
+        /// <summary>
+        /// 映射的属性名
+        /// </summary>
+        public string PropertyName { get; private set; }
+
         #region Text
 
         /// <summary>
@@ -208,12 +217,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string PropertyDescriptorsPropertyName = "PropertyDescriptors";
 
-        private Dictionary<string, DescriptorInfo> _PropertyDescriptors;
+        private DescriptorInfoDict _PropertyDescriptors;
 
         /// <summary>
         /// 子集描述对象
         /// </summary>
-        public Dictionary<string, DescriptorInfo> PropertyDescriptors
+        public DescriptorInfoDict PropertyDescriptors
         {
             get { return _PropertyDescriptors; }
 

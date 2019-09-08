@@ -68,11 +68,11 @@ namespace GiantappConfiger.Test
                 {"TestSetting",
                     new DescriptorInfo(){
                         Text = "node 0",
-                        PropertyDescriptors = new Dictionary<string, DescriptorInfo>() {
+                        PropertyDescriptors = new DescriptorInfoDict() {
                             {"P1", new DescriptorInfo(){ Text="int property"} },
                             {"P2", new DescriptorInfo(){ Text="string property",DefaultValue="xxx"} },
                             {"SubSetting", new DescriptorInfo(){ Text="string property",DefaultValue=new SubSetting(),
-                                PropertyDescriptors=new Dictionary<string, DescriptorInfo>()
+                                PropertyDescriptors=new DescriptorInfoDict()
                                 {
                                     {"SP1", new DescriptorInfo(){ Text="sub int property"} },
                                     {"SP2", new DescriptorInfo(){ Text="sub string property",DefaultValue="ooo"} }
@@ -82,16 +82,23 @@ namespace GiantappConfiger.Test
                     }}
             };
             //var vm = service.GetVM(setting, descriptor);
-            var vm = service.GetVM(descriptor, setting);
+            var vm = service.GetVM(new object[] { setting }, descriptor);
             Assert.IsTrue(vm.Nodes.Count == 1);
             Assert.IsTrue(vm.Nodes[0].Selected);
             Assert.IsTrue(vm.Nodes[0].Properties.Count == 4);
+            Assert.IsTrue(vm.Nodes[0].Properties[1].Value.ToString() == "xxx");
             Assert.IsTrue(vm.Nodes[0].Descriptor.Text == "node 0");
             var p1 = vm.Nodes[0].Properties[0];
             Assert.IsTrue(p1.Descriptor.Text == "int property");
             Assert.IsTrue((int)p1.Value == 1);
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[0].Descriptor.Text == "sub int property");
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[1].Descriptor.Text == "sub string property");
+
+            var tmpList = service.GetData<TestSetting>(vm.Nodes);
+            Assert.IsTrue(tmpList[0].P1 == 1);
+            Assert.IsTrue(tmpList[0].P2 == "xxx");
+            Assert.IsTrue(tmpList[0].P3);
+            Assert.IsTrue(tmpList[0].SubSetting.SP2 == "ooo");
         }
     }
 }

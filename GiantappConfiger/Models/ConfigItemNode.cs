@@ -8,29 +8,29 @@ namespace GiantappConfiger.Models
     public class ConfigItemNode : _ObservableObject
     {
         #region properties
-        
-        #region Children
+
+        #region SubNodes
 
         /// <summary>
         /// The <see cref="SubNodes" /> property's name.
         /// </summary>
-        public const string ChildrenPropertyName = "Children";
+        public const string SubNodesPropertyName = "SubNodes";
 
-        private ObservableCollection<ConfigItemNode> _Children;
+        private ObservableCollection<ConfigItemNode> _SubNodes;
 
         /// <summary>
         /// 子节点
         /// </summary>
         public ObservableCollection<ConfigItemNode> SubNodes
         {
-            get { return _Children; }
+            get { return _SubNodes; }
 
             set
             {
-                if (_Children == value) return;
+                if (_SubNodes == value) return;
 
-                _Children = value;
-                NotifyOfPropertyChange(ChildrenPropertyName);
+                _SubNodes = value;
+                NotifyOfPropertyChange(SubNodesPropertyName);
             }
         }
 
