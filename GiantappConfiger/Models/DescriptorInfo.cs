@@ -3,38 +3,14 @@ using System.Collections.ObjectModel;
 
 namespace GiantappConfiger.Models
 {
+    public class DescriptorInfoDict : Dictionary<string, DescriptorInfo>
+    {
+    }
     /// <summary>
     /// 用于描述配置字段
     /// </summary>
     public class DescriptorInfo : _ObservableObject
     {
-        #region Name
-
-        /// <summary>
-        /// The <see cref="Name" /> property's name.
-        /// </summary>
-        public const string NamePropertyName = "Name";
-
-        private string _Name;
-
-        /// <summary>
-        /// 字段名称 唯一标识
-        /// </summary>
-        public string Name
-        {
-            get { return _Name; }
-
-            set
-            {
-                if (_Name == value) return;
-
-                _Name = value;
-                NotifyOfPropertyChange(NamePropertyName);
-            }
-        }
-
-        #endregion
-
         #region Text
 
         /// <summary>
@@ -225,28 +201,28 @@ namespace GiantappConfiger.Models
 
         #endregion
 
-        #region SumbItems
+        #region PropertyDescriptors
 
         /// <summary>
-        /// The <see cref="SumbDescriptorInfo" /> property's name.
+        /// The <see cref="PropertyDescriptors" /> property's name.
         /// </summary>
-        public const string SumbItemsPropertyName = "SumbItems";
+        public const string PropertyDescriptorsPropertyName = "PropertyDescriptors";
 
-        private Dictionary<string, DescriptorInfo> _SumbItems;
+        private Dictionary<string, DescriptorInfo> _PropertyDescriptors;
 
         /// <summary>
         /// 子集描述对象
         /// </summary>
-        public Dictionary<string, DescriptorInfo> SumbDescriptorInfo
+        public Dictionary<string, DescriptorInfo> PropertyDescriptors
         {
-            get { return _SumbItems; }
+            get { return _PropertyDescriptors; }
 
             set
             {
-                if (_SumbItems == value) return;
+                if (_PropertyDescriptors == value) return;
 
-                _SumbItems = value;
-                NotifyOfPropertyChange(SumbItemsPropertyName);
+                _PropertyDescriptors = value;
+                NotifyOfPropertyChange(PropertyDescriptorsPropertyName);
             }
         }
 

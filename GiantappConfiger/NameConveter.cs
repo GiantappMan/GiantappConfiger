@@ -42,7 +42,7 @@ namespace GiantappConfiger
                         return lan;
                     }
                 }
-                return d.Name;
+                //return d.Name;
             }
 
             return value;

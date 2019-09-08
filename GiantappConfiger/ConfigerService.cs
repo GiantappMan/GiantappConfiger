@@ -16,92 +16,135 @@ namespace GiantappConfiger
 {
     public class ConfigerService
     {
-        public static T DeepClone<T>(T obj)
+        public ConfigerViewModel GetVM(DescriptorInfoDict descriptor, params object[] config)
+        {
+            var nodes = GetNodes(descriptor, config);
+            var vm = new ConfigerViewModel
+            {
+                Nodes = new ObservableCollection<ConfigItemNode>(nodes)
+            };
+            vm.Nodes[0].Selected = true;
+            return vm;
+        }
+
+        public T GetData<T>(IList<ConfigItemNode> nodes)
+        {
+            return default;
+            //var result = new ExpandoObject() as IDictionary<string, object>;
+            //foreach (var nodeItem in nodes)
+            //{
+            //    var tempNodeObj = GetDataFromNode(nodeItem);
+
+            //    foreach (var subNode in nodeItem.SubNodes)
+            //    {
+            //        var subNodeObj = GetDataFromNode(subNode);
+            //        tempNodeObj.Add(subNode.Descriptor.Name, subNodeObj);
+            //    }
+            //    result.Add(nodeItem.Descriptor.Name, tempNodeObj);
+            //}
+            //return result;
+        }
+
+        #region private
+
+        private static T DeepClone<T>(T obj)
         {
             var json = JsonConvert.SerializeObject(obj);
             var type = obj.GetType();
             return (T)JsonConvert.DeserializeObject(json, type);
         }
 
-        public ConfigerViewModel GetVM(object config, DescriptorInfo descConfig = null)
-        {
-            var vm = new ConfigerViewModel
-            {
-                Nodes = GetNodes(config, descConfig)
-            };
-            vm.Nodes[0].Selected = true;
-            return vm;
-        }
-
-        public UserControl GetView(object config, DescriptorInfo desc)
-        {
-            var control = new ConfigControl
-            {
-                DataContext = GetVM(config, desc)
-            };
-            return control;
-        }
-
-        public object GetData(ObservableCollection<ConfigItemNode> nodes)
-        {
-            var result = new ExpandoObject() as IDictionary<string, object>;
-            foreach (var nodeItem in nodes)
-            {
-                var tempNodeObj = GetDataFromNode(nodeItem);
-
-                foreach (var subNode in nodeItem.SubNodes)
-                {
-                    var subNodeObj = GetDataFromNode(subNode);
-                    tempNodeObj.Add(subNode.Descriptor.Name, subNodeObj);
-                }
-                result.Add(nodeItem.Descriptor.Name, tempNodeObj);
-            }
-            return result;
-        }
-
-        #region private
-
         private IDictionary<string, object> GetDataFromNode(ConfigItemNode nodeItem)
         {
-            var tempNodeObj = new ExpandoObject() as IDictionary<string, object>;
-            foreach (var propertyItem in nodeItem.Properties)
-            {
-                tempNodeObj.Add(propertyItem.Descriptor.Name, propertyItem.Value);
-            }
-            return tempNodeObj;
+            return null;
+            //var tempNodeObj = new ExpandoObject() as IDictionary<string, object>;
+            //foreach (var propertyItem in nodeItem.Properties)
+            //{
+            //    tempNodeObj.Add(propertyItem.Descriptor.Name, propertyItem.Value);
+            //}
+            //return tempNodeObj;
         }
 
-        private ObservableCollection<ConfigItemNode> GetNodes(object data, DescriptorInfo descriptor)
+        private List<ConfigItemNode> GetNodes(DescriptorInfoDict descriptor, params object[] configs)
         {
-            if (data == null || IsValue(data.GetType()))
-                return null;
+            List<ConfigItemNode> result = new List<ConfigItemNode>();
+            foreach (var configItem in configs)
+            {
+                if (configItem == null || IsValue(configItem.GetType()))
+                    return null;
 
-            var result = new ObservableCollection<ConfigItemNode>();
-            var node = new ConfigItemNode();
-            if (descriptor == null)
-                descriptor = new DescriptorInfo() { Text = data.GetType().Name };
-
-            //拷贝，不破坏元对象。只需要保留当前级的信息，节约内存
-            descriptor = DeepClone(descriptor);
-            descriptor.SumbDescriptorInfo = null;
-
-            node.Descriptor = descriptor;
-            node.Properties = GetProperties(data, descriptor.SumbDescriptorInfo);
-
-            result.Add(node);
+                var type = configItem.GetType();
+                string key = type.Name;
+                ConfigItemNode tmp = GetNode(configItem, descriptor[key]);
+                result.Add(tmp);
+            }
             return result;
         }
 
-        private ObservableCollection<ConfigItemProperty> GetProperties(object data, Dictionary<string, DescriptorInfo> descriptor)
+        private ConfigItemNode GetNode(object data, DescriptorInfo descriptorInfo)
         {
-            var subProperties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            var node = new ConfigItemNode();
+            if (descriptorInfo == null)
+                descriptorInfo = new DescriptorInfo() { Text = data.GetType().Name };
+
+            var propertyTypes = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            node.Properties = GetProperties(data, propertyTypes, descriptorInfo.PropertyDescriptors);
+            var subNodes = GetSubNodes(data, propertyTypes, descriptorInfo.PropertyDescriptors);
+            node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
+            //node.SubNodes=GetNodes(descriptorInfo.PropertyDescriptors,)
+
+            //拷贝，不破坏元对象。只需要保留当前级的信息，节约内存
+            descriptorInfo = DeepClone(descriptorInfo);
+            descriptorInfo.PropertyDescriptors = null;
+            node.Descriptor = descriptorInfo;
+
+            return node;
+        }
+
+        private IList<ConfigItemNode> GetSubNodes(object data, PropertyInfo[] propertyTypes, Dictionary<string, DescriptorInfo> propertyDescriptors)
+        {
+            var result = new List<ConfigItemNode>();
+            foreach (var pType in propertyTypes)
+            {
+                ConfigItemNode node = new ConfigItemNode();
+
+                DescriptorInfo subDescriptor = null;
+                if (propertyDescriptors != null && propertyDescriptors.ContainsKey(pType.Name))
+                    subDescriptor = propertyDescriptors[pType.Name];
+                else
+                    subDescriptor = new DescriptorInfo() { Text = pType.Name };
+                var property = new ConfigItemProperty
+                {
+                    Descriptor = subDescriptor
+                };
+
+                var isValue = IsValue(pType.PropertyType);
+                if (isValue)
+                    continue;
+
+                if (property.Value == null)
+                    //子对象
+                    property.Value = Activator.CreateInstance(pType.PropertyType);
+
+                propertyTypes = property.Value.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+                var subNodes = GetSubNodes(property.Value, propertyTypes, subDescriptor.PropertyDescriptors);
+                if (subNodes != null)
+                    node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
+                node.Properties = GetProperties(property.Value, propertyTypes, subDescriptor.PropertyDescriptors);
+                result.Add(node);
+            }
+            return result;
+        }
+
+        private ObservableCollection<ConfigItemProperty> GetProperties(object data, PropertyInfo[] instanceProperties, Dictionary<string, DescriptorInfo> descriptors)
+        {
             var tmpProperties = new ObservableCollection<ConfigItemProperty>();
-            foreach (var pType in subProperties)
+            foreach (var pType in instanceProperties)
             {
                 DescriptorInfo subDescriptor = null;
-                if (descriptor != null && descriptor.ContainsKey(pType.Name))
+                if (descriptors != null && descriptors.ContainsKey(pType.Name))
                 {
-                    subDescriptor = descriptor[pType.Name];
+                    subDescriptor = descriptors[pType.Name];
                 }
                 else
                     subDescriptor = new DescriptorInfo() { Text = pType.Name };
@@ -120,20 +163,20 @@ namespace GiantappConfiger
                 }
                 else
                 {
-                    if (property.Value == null)
-                    {
-                        //子对象
-                        property.Value = Activator.CreateInstance(pType.PropertyType);
-                        if (node.SubNodes == null)
-                            node.SubNodes = new ObservableCollection<ConfigItemNode>();
+                    //if (property.Value == null)
+                    //{
+                    //    //子对象
+                    //    property.Value = Activator.CreateInstance(pType.PropertyType);
+                    //    if (node.SubNodes == null)
+                    //        node.SubNodes = new ObservableCollection<ConfigItemNode>();
 
-                        var subNodes = GetNodes(property.Value, subDescriptor);
-                        if (subNodes != null)
-                            node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
-                    }
+                    //    var subNodes = GetNode(property.Value, subDescriptor);
+                    //    if (subNodes != null)
+                    //        node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
+                    //}
                 }
             }
-            return tmpProperties
+            return tmpProperties;
         }
 
         private bool IsValue(Type type)
