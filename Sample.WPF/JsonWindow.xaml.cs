@@ -27,7 +27,6 @@ namespace Sample.WPF
     public partial class JsonWindow : Window
     {
         readonly ConfigerService service = new ConfigerService();
-        UserControl control;
         readonly string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.json");
         readonly string defaultPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.default.json");
         readonly string descPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.desc.json");
@@ -44,7 +43,7 @@ namespace Sample.WPF
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var data = await JsonHelper.JsonDeserializeFromFileAsync<Setting>(path);
-            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<DescriptorInfo>(descPath);
+            var dataDesc = await JsonHelper.JsonDeserializeFromFileAsync<DescriptorInfoDict>(descPath);
             List<dynamic> extraDescObjs = new List<dynamic>();
 
             extraDescObjs.Add(new
@@ -60,15 +59,13 @@ namespace Sample.WPF
                     value = i
                 });
             }
-            control = service.GetView(data, dataDesc);
-
-            grid.Children.Insert(0, control);
+            configer.DataContext = service.GetVM(new object[] { data }, dataDesc);
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var vm = control.DataContext as ConfigerViewModel;
-            var data = service.GetData(vm.Nodes);
+            var vm = configer.DataContext as ConfigerViewModel;
+            var data = service.GetData<Setting>(vm.Nodes);
             _ = await JsonHelper.JsonSerializeAsync(data, path);
         }
     }

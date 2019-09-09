@@ -14,11 +14,6 @@ namespace GiantappConfiger
             InitializeComponent();
         }
 
-        public void Init(object obj)
-        {
-            throw new NotImplementedException();
-        }
-
         public string Column0Width
         {
             get { return (string)GetValue(Column0WidthProperty); }

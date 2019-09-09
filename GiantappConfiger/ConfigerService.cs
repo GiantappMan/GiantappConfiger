@@ -16,6 +16,10 @@ namespace GiantappConfiger
 {
     public class ConfigerService
     {
+        public ConfigerViewModel GetVM(object config, DescriptorInfoDict descriptor)
+        {
+            return GetVM(new object[] { config }, descriptor);
+        }
         public ConfigerViewModel GetVM(object[] configs, DescriptorInfoDict descriptor)
         {
             var nodes = GetNodes(configs, descriptor);
@@ -27,16 +31,12 @@ namespace GiantappConfiger
             return vm;
         }
 
-        public List<T> GetData<T>(IList<ConfigItemNode> nodes)
+        public List<T> GetAllData<T>(IList<ConfigItemNode> nodes)
         {
-            //var tmp = new ExpandoObject() as IDictionary<string, object>;
             var tmpList = new List<ExpandoObject>();
             foreach (var nodeItem in nodes)
             {
                 ExpandoObject tempNodeObj = GetDataFromNode(nodeItem) as ExpandoObject;
-                //var tmp = new ExpandoObject() as IDictionary<string, object>;
-
-                //tmp.Add(nodeItem.Descriptor.PropertyName, tempNodeObj);
                 tmpList.Add(tempNodeObj);
             }
 
@@ -44,6 +44,11 @@ namespace GiantappConfiger
             JArray array = JsonConvert.DeserializeObject<JArray>(json);
             var result = array.ToObject<List<T>>();
             return result;
+        }
+
+        public T GetData<T>(IList<ConfigItemNode> nodes)
+        {
+            return GetAllData<T>(nodes)[0];
         }
 
         #region private
@@ -78,21 +83,26 @@ namespace GiantappConfiger
             foreach (var configItem in configs)
             {
                 var type = configItem.GetType();
-
-                DescriptorInfo descInfo = GetOrCreateDescriptorInfo(type.Name, descriptor);
+                DescriptorInfo descInfo = GetOrCreateDescriptorInfo(type.Name, type, descriptor);
                 var node = GetNode(configItem, descInfo);
                 result.Add(node);
             }
             return result;
         }
 
-        private DescriptorInfo GetOrCreateDescriptorInfo(string key, DescriptorInfoDict descriptor)
+        private DescriptorInfo GetOrCreateDescriptorInfo(string key, Type sourceType, DescriptorInfoDict descriptor)
         {
             DescriptorInfo descInfo;
-            if (descriptor.ContainsKey(key))
+            if (descriptor != null && descriptor.ContainsKey(key))
                 descInfo = descriptor[key];
             else
-                descInfo = new DescriptorInfo() { Text = key };//生成默认描述信息
+            {
+                //生成默认描述信息
+                descInfo = new DescriptorInfo() { Text = key };
+
+                if (sourceType == typeof(TimeSpan))
+                    descInfo.Type = PropertyType.TimeSpan;
+            }
             DescriptorInfo.SetPropertyName(key, descInfo);
             return descInfo;
         }
@@ -116,7 +126,7 @@ namespace GiantappConfiger
                 //property
                 var isValue = IsValue(pType.PropertyType);
                 var value = pType.GetValue(configItem);
-                var valueDescriptor = GetOrCreateDescriptorInfo(pType.Name, descriptor.PropertyDescriptors);
+                var valueDescriptor = GetOrCreateDescriptorInfo(pType.Name, pType.PropertyType, descriptor.PropertyDescriptors);
                 if (isValue)
                 {
                     var tmpP = new ConfigItemProperty()
@@ -136,15 +146,6 @@ namespace GiantappConfiger
                     var subPropertyTypes = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
                     var tmpNode = GetNode(value, valueDescriptor);
                     result.SubNodes.Add(tmpNode);
-                    //foreach (var subType in subPropertyTypes)
-                    //{
-                    //    var subValue = subType.GetValue(value);
-                    //    if (subValue == null && !IsValue(subType.PropertyType))
-                    //        subValue = Activator.CreateInstance(subType.PropertyType);
-                    //    var subDescInfo = GetOrCreateDescriptorInfo(subType.Name, descriptor.PropertyDescriptors);
-                    //    var tmpNode = GetNode(subValue, subDescInfo);
-                    //    result.SubNodes.Add(tmpNode);
-                    //}
                 }
             }
             //拷贝，不破坏元对象。只需要保留当前级的信息，节约内存
@@ -156,106 +157,11 @@ namespace GiantappConfiger
             return result;
         }
 
-        //private ConfigItemNode GetNodeDepth0(object data, DescriptorInfo descriptorInfo)
-        //{
-        //    var node = new ConfigItemNode();
-        //    if (descriptorInfo == null)
-        //        descriptorInfo = new DescriptorInfo() { Text = data.GetType().Name };
-
-        //    var propertyTypes = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
-        //    node.Properties = GetProperties(data, propertyTypes, descriptorInfo.PropertyDescriptors);
-        //    var subNodes = GetSubNodes(data, propertyTypes, descriptorInfo.PropertyDescriptors);
-        //    node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
-
-        //    //拷贝，不破坏元对象。只需要保留当前级的信息，节约内存
-        //    descriptorInfo = DeepClone(descriptorInfo);
-        //    descriptorInfo.PropertyDescriptors = null;
-        //    node.Descriptor = descriptorInfo;
-
-        //    return node;
-        //}
-
-        //private IList<ConfigItemNode> GetSubNodes(object data, PropertyInfo[] propertyTypes, Dictionary<string, DescriptorInfo> propertyDescriptors)
-        //{
-        //    var result = new List<ConfigItemNode>();
-        //    foreach (var pType in propertyTypes)
-        //    {
-        //        ConfigItemNode node = new ConfigItemNode();
-
-        //        DescriptorInfo subDescriptor = null;
-        //        if (propertyDescriptors != null && propertyDescriptors.ContainsKey(pType.Name))
-        //            subDescriptor = propertyDescriptors[pType.Name];
-        //        else
-        //            subDescriptor = new DescriptorInfo() { Text = pType.Name };
-        //        var property = new ConfigItemProperty
-        //        {
-        //            Descriptor = subDescriptor
-        //        };
-
-        //        var isValue = IsValue(pType.PropertyType);
-        //        if (isValue)
-        //            continue;
-
-        //        if (property.Value == null)
-        //            //子对象
-        //            property.Value = Activator.CreateInstance(pType.PropertyType);
-
-        //        propertyTypes = property.Value.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
-        //        var subNodes = GetSubNodes(property.Value, propertyTypes, subDescriptor.PropertyDescriptors);
-        //        if (subNodes != null)
-        //            node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
-        //        node.Properties = GetProperties(property.Value, propertyTypes, subDescriptor.PropertyDescriptors);
-        //        result.Add(node);
-        //    }
-        //    return result;
-        //}
-
-        //private ObservableCollection<ConfigItemProperty> GetProperties(object data, PropertyInfo[] instanceProperties, Dictionary<string, DescriptorInfo> descriptors)
-        //{
-        //    var tmpProperties = new ObservableCollection<ConfigItemProperty>();
-        //    foreach (var pType in instanceProperties)
-        //    {
-        //        DescriptorInfo subDescriptor = null;
-        //        if (descriptors != null && descriptors.ContainsKey(pType.Name))
-        //        {
-        //            subDescriptor = descriptors[pType.Name];
-        //        }
-        //        else
-        //            subDescriptor = new DescriptorInfo() { Text = pType.Name };
-        //        var property = new ConfigItemProperty
-        //        {
-        //            Descriptor = subDescriptor
-        //        };
-
-        //        var isValue = IsValue(pType.PropertyType);
-        //        if (isValue)
-        //        {
-        //            var currentValue = pType.GetValue(data);
-        //            property.Value = currentValue;
-        //            if (property != null)
-        //                tmpProperties.Add(property);
-        //        }
-        //        else
-        //        {
-        //            //if (property.Value == null)
-        //            //{
-        //            //    //子对象
-        //            //    property.Value = Activator.CreateInstance(pType.PropertyType);
-        //            //    if (node.SubNodes == null)
-        //            //        node.SubNodes = new ObservableCollection<ConfigItemNode>();
-
-        //            //    var subNodes = GetNode(property.Value, subDescriptor);
-        //            //    if (subNodes != null)
-        //            //        node.SubNodes = new ObservableCollection<ConfigItemNode>(subNodes);
-        //            //}
-        //        }
-        //    }
-        //    return tmpProperties;
-        //}
-
         private bool IsValue(Type type)
         {
-            return type.IsPrimitive || type.Equals(typeof(string));
+            return type.IsPrimitive
+                || type.Equals(typeof(string))
+                || type.Equals(typeof(TimeSpan));
         }
 
         #endregion

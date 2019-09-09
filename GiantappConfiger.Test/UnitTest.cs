@@ -94,7 +94,7 @@ namespace GiantappConfiger.Test
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[0].Descriptor.Text == "sub int property");
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[1].Descriptor.Text == "sub string property");
 
-            var tmpList = service.GetData<TestSetting>(vm.Nodes);
+            var tmpList = service.GetAllData<TestSetting>(vm.Nodes);
             Assert.IsTrue(tmpList[0].P1 == 1);
             Assert.IsTrue(tmpList[0].P2 == "xxx");
             Assert.IsTrue(tmpList[0].P3);

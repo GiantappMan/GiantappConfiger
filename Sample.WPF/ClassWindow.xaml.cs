@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GiantappConfiger;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -12,10 +13,16 @@ using System.Windows.Shapes;
 
 namespace Sample.WPF
 {
+    public class SubT
+    {
+        public int MyProperty { get; set; } = 5;
+    }
     public class TestSetting
     {
         public string Str1 { get; set; }
+        public string Str2 { get; set; }
         public bool B2 { get; set; }
+        public SubT T2 { get; set; }
     }
 
     /// <summary>
@@ -26,10 +33,13 @@ namespace Sample.WPF
         public ClassWindow()
         {
             InitializeComponent();
-            configer.Init(new TestSetting()
+            ConfigerService service = new ConfigerService();
+            var tmp = new TestSetting()
             {
-                Str1 = "test",
-            });
+                Str1 = "6",
+            };
+            var vm = service.GetVM(new object[] { tmp }, null);
+            configer.DataContext = vm;
         }
     }
 }
