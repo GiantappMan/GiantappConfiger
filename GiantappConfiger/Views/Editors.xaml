@@ -5,8 +5,8 @@
     xmlns:rules="clr-namespace:GiantappConfiger.ValidationRules">
 
     <local:TemplateSelector x:Key="TemplateSelector" />
-    <local:NameConveter x:Key="NameConveter" />
-    <local:NameConveter x:Key="DescConveter" ReadDesc="True" />
+    <local:TextConveter x:Key="NameConveter" />
+    <local:TextConveter x:Key="DescConveter" ReadDesc="True" />
     <Style x:Key="TextBlock_Desc" TargetType="TextBlock">
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -136,8 +136,9 @@
             </TextBlock>
             <ComboBox
                 Grid.Column="1"
-                ItemsSource="{Binding ItemsSource}"
-                SelectedItem="{Binding Selected, Mode=TwoWay}"
+                ItemsSource="{Binding Descriptor.Options}"
+                SelectedValue="{Binding Value, Mode=TwoWay}"
+                SelectedValuePath="DefaultValue"
                 Style="{StaticResource Element_Setting}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>

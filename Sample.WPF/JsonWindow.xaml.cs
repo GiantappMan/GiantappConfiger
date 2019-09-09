@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,7 +29,6 @@ namespace Sample.WPF
     {
         readonly ConfigerService service = new ConfigerService();
         readonly string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.json");
-        readonly string defaultPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.default.json");
         readonly string descPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.desc.json");
         public JsonWindow()
         {
@@ -66,7 +66,9 @@ namespace Sample.WPF
         {
             var vm = configer.DataContext as ConfigerViewModel;
             var data = service.GetData<Setting>(vm.Nodes);
-            _ = await JsonHelper.JsonSerializeAsync(data, path);
+            var setting = await JsonHelper.JsonSerializeAsync(data, path);
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(data.S3);
+            await LanService.UpdateLanguage();
         }
     }
 }

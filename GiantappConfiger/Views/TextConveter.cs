@@ -5,7 +5,7 @@ using MultiLanguageForXAML;
 using System.Windows.Data;
 namespace GiantappConfiger
 {
-    public class NameConveter : IValueConverter
+    public class TextConveter : IValueConverter
     {
         public bool ReadDesc { get; set; }
 
@@ -14,8 +14,10 @@ namespace GiantappConfiger
             DescriptorInfo d = null;
             if (value is ConfigItemNode node)
                 d = node.Descriptor;
-            if (value is ConfigItemProperty property)
+            else if (value is ConfigItemProperty property)
                 d = property.Descriptor;
+            else if (value is DescriptorInfo)
+                d = value as DescriptorInfo;
 
             if (d != null)
             {
@@ -36,7 +38,7 @@ namespace GiantappConfiger
                     if (!string.IsNullOrEmpty(d.Text))
                         return d.Text;
 
-                    if (!string.IsNullOrEmpty(d.Text))
+                    if (!string.IsNullOrEmpty(d.TextKey))
                     {
                         string lan = LanService.Get(d.TextKey).Result;
                         return lan;
