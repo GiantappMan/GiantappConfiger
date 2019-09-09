@@ -27,6 +27,11 @@ namespace Sample.WPF
     /// </summary>
     public partial class JsonWindow : Window
     {
+        static JsonWindow()
+        {
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data\\Languages");
+            LanService.Init(new JsonDB(path), true);
+        }
         readonly ConfigerService service = new ConfigerService();
         readonly string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.json");
         readonly string descPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.desc.json");
@@ -34,8 +39,6 @@ namespace Sample.WPF
         {
             InitializeComponent();
 
-            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data\\Languages");
-            LanService.Init(new JsonDB(path), true);
 
             Loaded += MainWindow_Loaded;
         }

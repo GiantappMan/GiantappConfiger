@@ -12,6 +12,6 @@
     <Description>mscoder.cn</Description>
   </PropertyGroup> 
   <ItemGroup>
-    <PackageReference Include="MultiLanguageForXAML" Version="2.0.2.5" />
+    <PackageReference Include="MultiLanguageForXAML" Version="2.0.3" />
   </ItemGroup>
 </Project>
