@@ -9,10 +9,11 @@
 
 # 用法
 ```
-.xaml
+//.xaml
     xmlns:giantappconfiger="clr-namespace:GiantappConfiger;assembly=GiantappConfiger"
 ...
         <giantappconfiger:ConfigControl x:Name="configer" />
+...
 
 ```
 ```
