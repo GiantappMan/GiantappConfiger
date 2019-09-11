@@ -8,16 +8,12 @@
 - [x] 外部文件描述
 
 # 用法
-```
 //.xaml
-    xmlns:giantappconfiger="clr-namespace:GiantappConfiger;assembly=GiantappConfiger"
-...
-        <giantappconfiger:ConfigControl x:Name="configer" />
-...
-
 ```
+        <giantappconfiger:ConfigControl x:Name="configer" />
 ```
 //.cs
+```
             ConfigerService service = new ConfigerService();
             var tmp = new TestSetting()
             {
