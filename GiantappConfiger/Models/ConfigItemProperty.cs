@@ -10,7 +10,8 @@ namespace GiantappConfiger.Models
         String,
         Boolean,
         TimeSpan,
-        Combobox
+        Combobox,
+        List
     }
 
     /// <summary>

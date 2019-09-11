@@ -102,6 +102,11 @@ namespace GiantappConfiger
 
                 if (sourceType == typeof(TimeSpan))
                     descInfo.Type = PropertyType.TimeSpan;
+
+                if (IsList(sourceType))
+                {
+                    descInfo.Type = PropertyType.List;
+                }
             }
             DescriptorInfo.SetPropertyName(key, descInfo);
             return descInfo;
@@ -161,7 +166,14 @@ namespace GiantappConfiger
         {
             return type.IsPrimitive
                 || type.Equals(typeof(string))
-                || type.Equals(typeof(TimeSpan));
+                || type.Equals(typeof(TimeSpan))
+                || IsList(type);
+        }
+
+        private bool IsList(Type type)
+        {
+            bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+            return isList;
         }
 
         #endregion

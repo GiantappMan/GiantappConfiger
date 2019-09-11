@@ -38,11 +38,8 @@ namespace Sample.WPF
         public JsonWindow()
         {
             InitializeComponent();
-
-
             Loaded += MainWindow_Loaded;
         }
-
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var data = await JsonHelper.JsonDeserializeFromFileAsync<Setting>(path);

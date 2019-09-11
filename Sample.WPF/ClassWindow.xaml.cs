@@ -17,12 +17,18 @@ namespace Sample.WPF
     {
         public int MyProperty { get; set; } = 5;
     }
+    public class SubT2
+    {
+        public string MyProperty2 { get; set; } = "s";
+    }
+
     public class TestSetting
     {
         public string Str1 { get; set; }
         public string Str2 { get; set; }
         public bool B2 { get; set; }
-        public SubT T2 { get; set; }
+        public SubT T1 { get; set; }
+        public List<SubT2> T2 { get; set; }
     }
 
     /// <summary>
