@@ -5,11 +5,14 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>GiantappConfiger</AssemblyName>
     <RootNamespace>GiantappConfiger</RootNamespace>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageId>GiantappConfiger</PackageId>
     <Authors>DaZiYuan</Authors>
-    <Product>巨应工作室 | GiantApp Studio</Product>
-    <Description>mscoder.cn</Description>
+    <Product></Product>
+    <Description>懒人专用配置界面生成器，根据传入对象自动生成UI界面
+giantapp.cn
+mscoder.cn</Description>
+    <Company>巨应工作室 | GiantApp Studio</Company>
   </PropertyGroup> 
   <ItemGroup>
     <PackageReference Include="MultiLanguageForXAML" Version="2.0.3" />

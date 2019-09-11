@@ -9,13 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.WPF", "Sample.WPF\Sa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{1B638385-BCDE-451E-A0F2-6858FE1A2907}"
 	ProjectSection(SolutionItems) = preProject
-		Docs\Env.md = Docs\Env.md
+		Docs\Pack.md = Docs\Pack.md
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GiantappConfiger", "GiantappConfiger\GiantappConfiger.csproj", "{F59C242C-7F08-48B3-8092-B19DF82BE66A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GiantappConfiger.Test", "GiantappConfiger.Test\GiantappConfiger.Test.csproj", "{D2A9DB68-2531-4280-9CFB-62F4A99C3A5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GiantappConfiger.Test", "GiantappConfiger.Test\GiantappConfiger.Test.csproj", "{D2A9DB68-2531-4280-9CFB-62F4A99C3A5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
