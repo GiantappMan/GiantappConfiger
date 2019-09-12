@@ -16,6 +16,6 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <giantappconfiger:ConfigControl x:Name="configer" />
-        <Button Grid.Row="1">Save</Button>
+        <Button Grid.Row="1" Click="Button_Click">Save</Button>
     </Grid>
 </Window>

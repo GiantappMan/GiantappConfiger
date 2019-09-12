@@ -167,7 +167,7 @@
                 Grid.Column="1"
                 Grid.ColumnSpan="2"
                 ItemsSource="{Binding Value}" />
-            <Button Grid.Column="2">+</Button>
+            <Button Grid.Column="2" Command="{Binding AddItemCommand}">+</Button>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

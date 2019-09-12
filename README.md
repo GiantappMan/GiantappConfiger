@@ -14,11 +14,10 @@
 ```
 //.cs
 ```
-            ConfigerService service = new ConfigerService();
             var tmp = new TestSetting()
             {
                 Str1 = "6",
             };
-            var vm = service.GetVM(new object[] { tmp }, null);
+            var vm = ConfigerService.GetVM(new object[] { tmp }, null);
             configer.DataContext = vm;
 ```

@@ -1,11 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using GiantappMvvm.Base;
+using System.Collections.ObjectModel;
 
 namespace GiantappConfiger.Models
 {
     /// <summary>
     /// 表示一个数据节点，UI左侧
     /// </summary>
-    public class ConfigItemNode : _ObservableObject
+    public class ConfigItemNode : ObservableObj
     {
         #region properties
 

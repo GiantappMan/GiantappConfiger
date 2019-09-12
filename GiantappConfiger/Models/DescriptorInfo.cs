@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GiantappMvvm.Base;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace GiantappConfiger.Models
@@ -9,7 +11,7 @@ namespace GiantappConfiger.Models
     /// <summary>
     /// 用于描述配置字段
     /// </summary>
-    public class DescriptorInfo : _ObservableObject
+    public class DescriptorInfo : ObservableObj
     {
         public static void SetPropertyName(string name, DescriptorInfo info)
         {
@@ -234,6 +236,8 @@ namespace GiantappConfiger.Models
                 NotifyOfPropertyChange(PropertyDescriptorsPropertyName);
             }
         }
+
+        public Type SourceType { get; internal set; }
 
         #endregion
     }

@@ -15,6 +15,7 @@ mscoder.cn</Description>
     <Company>巨应工作室 | GiantApp Studio</Company>
   </PropertyGroup> 
   <ItemGroup>
+    <PackageReference Include="GiantappMvvm.Base" Version="1.0.0" />
     <PackageReference Include="MultiLanguageForXAML" Version="2.0.3" />
   </ItemGroup>
 </Project>

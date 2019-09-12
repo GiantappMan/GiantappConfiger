@@ -14,13 +14,13 @@ using Newtonsoft.Json;
 
 namespace GiantappConfiger
 {
-    public class ConfigerService
+    public static class ConfigerService
     {
-        public ConfigerViewModel GetVM(object config, DescriptorInfoDict descriptor)
+        public static ConfigerViewModel GetVM(object config, DescriptorInfoDict descriptor)
         {
             return GetVM(new object[] { config }, descriptor);
         }
-        public ConfigerViewModel GetVM(object[] configs, DescriptorInfoDict descriptor)
+        public static ConfigerViewModel GetVM(object[] configs, DescriptorInfoDict descriptor)
         {
             var nodes = GetNodes(configs, descriptor);
             var vm = new ConfigerViewModel
@@ -31,7 +31,7 @@ namespace GiantappConfiger
             return vm;
         }
 
-        public List<T> GetAllData<T>(IList<ConfigItemNode> nodes)
+        public static List<T> GetAllData<T>(IList<ConfigItemNode> nodes)
         {
             var tmpList = new List<ExpandoObject>();
             foreach (var nodeItem in nodes)
@@ -46,7 +46,7 @@ namespace GiantappConfiger
             return result;
         }
 
-        public T GetData<T>(IList<ConfigItemNode> nodes)
+        public static T GetData<T>(IList<ConfigItemNode> nodes)
         {
             return GetAllData<T>(nodes)[0];
         }
@@ -60,7 +60,7 @@ namespace GiantappConfiger
             return (T)JsonConvert.DeserializeObject(json, type);
         }
 
-        private IDictionary<string, object> GetDataFromNode(ConfigItemNode nodeItem)
+        private static IDictionary<string, object> GetDataFromNode(ConfigItemNode nodeItem)
         {
             var result = new ExpandoObject() as IDictionary<string, object>;
             foreach (var propertyItem in nodeItem.Properties)
@@ -77,7 +77,7 @@ namespace GiantappConfiger
             return result;
         }
 
-        private List<ConfigItemNode> GetNodes(object[] configs, DescriptorInfoDict descriptor)
+        private static List<ConfigItemNode> GetNodes(object[] configs, DescriptorInfoDict descriptor)
         {
             List<ConfigItemNode> result = new List<ConfigItemNode>();
             foreach (var configItem in configs)
@@ -90,7 +90,7 @@ namespace GiantappConfiger
             return result;
         }
 
-        private DescriptorInfo GetOrCreateDescriptorInfo(string key, Type sourceType, DescriptorInfoDict descriptor)
+        private static DescriptorInfo GetOrCreateDescriptorInfo(string key, Type sourceType, DescriptorInfoDict descriptor)
         {
             DescriptorInfo descInfo;
             if (descriptor != null && descriptor.ContainsKey(key))
@@ -99,7 +99,7 @@ namespace GiantappConfiger
             {
                 //生成默认描述信息
                 descInfo = new DescriptorInfo() { Text = key };
-
+                descInfo.SourceType = sourceType;
                 if (sourceType == typeof(TimeSpan))
                     descInfo.Type = PropertyType.TimeSpan;
 
@@ -112,18 +112,13 @@ namespace GiantappConfiger
             return descInfo;
         }
 
-        private string GetDataKey(object obj)
+        private static ConfigItemNode GetNode(object configItem, DescriptorInfo descriptor)
         {
-            var type = obj.GetType();
-            string key = type.Name;
-            return key;
-        }
-
-        private ConfigItemNode GetNode(object configItem, DescriptorInfo descriptor)
-        {
-            ConfigItemNode result = new ConfigItemNode();
-            result.Properties = new ObservableCollection<ConfigItemProperty>();
-            result.SubNodes = new ObservableCollection<ConfigItemNode>();
+            ConfigItemNode result = new ConfigItemNode
+            {
+                Properties = new ObservableCollection<ConfigItemProperty>(),
+                SubNodes = new ObservableCollection<ConfigItemNode>()
+            };
 
             var propertyTypes = configItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
             foreach (var pType in propertyTypes)
@@ -134,6 +129,10 @@ namespace GiantappConfiger
                 var valueDescriptor = GetOrCreateDescriptorInfo(pType.Name, pType.PropertyType, descriptor.PropertyDescriptors);
                 if (isValue)
                 {
+                    if (value == null && IsList(pType.PropertyType))
+                    {
+                        value = new ObservableCollection<object>();
+                    }
                     var tmpP = new ConfigItemProperty()
                     {
                         Descriptor = valueDescriptor,
@@ -162,7 +161,7 @@ namespace GiantappConfiger
             return result;
         }
 
-        private bool IsValue(Type type)
+        private static bool IsValue(Type type)
         {
             return type.IsPrimitive
                 || type.Equals(typeof(string))
@@ -170,7 +169,7 @@ namespace GiantappConfiger
                 || IsList(type);
         }
 
-        private bool IsList(Type type)
+        private static bool IsList(Type type)
         {
             bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
             return isList;

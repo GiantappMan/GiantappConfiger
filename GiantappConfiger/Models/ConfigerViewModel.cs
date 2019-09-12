@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using GiantappMvvm.Base;
+using System.Collections.ObjectModel;
 
 namespace GiantappConfiger.Models
 {
-    public class ConfigerViewModel : _ObservableObject
+    public class ConfigerViewModel : ObservableObj
     {
         #region properties
 

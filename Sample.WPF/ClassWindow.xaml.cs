@@ -1,4 +1,5 @@
 ﻿using GiantappConfiger;
+using GiantappConfiger.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,16 +37,22 @@ namespace Sample.WPF
     /// </summary>
     public partial class ClassWindow : Window
     {
+        TestSetting tmp = new TestSetting()
+        {
+            Str1 = "6",
+        };
+        ConfigerViewModel _vm;
         public ClassWindow()
         {
             InitializeComponent();
-            ConfigerService service = new ConfigerService();
-            var tmp = new TestSetting()
-            {
-                Str1 = "6",
-            };
-            var vm = service.GetVM(new object[] { tmp }, null);
-            configer.DataContext = vm;
+
+            _vm = ConfigerService.GetVM(new object[] { tmp }, null);
+            configer.DataContext = _vm;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            tmp = ConfigerService.GetData<TestSetting>(_vm.Nodes);
         }
     }
 }

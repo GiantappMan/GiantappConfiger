@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GiantappMvvm.Base;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace GiantappConfiger.Models
 {
@@ -17,7 +19,7 @@ namespace GiantappConfiger.Models
     /// <summary>
     /// 表示一个可填的字段，界面右边
     /// </summary>
-    public class ConfigItemProperty : _ObservableObject
+    public class ConfigItemProperty : ObservableObj
     {
         #region Value
 
@@ -26,12 +28,12 @@ namespace GiantappConfiger.Models
         /// </summary>
         public const string ValuePropertyName = "Value";
 
-        private Object _Value;
+        private object _Value;
 
         /// <summary>
         /// Value
         /// </summary>
-        public Object Value
+        public object Value
         {
             get { return _Value; }
 
@@ -41,64 +43,6 @@ namespace GiantappConfiger.Models
 
                 _Value = value;
                 NotifyOfPropertyChange(ValuePropertyName);
-            }
-        }
-
-        #endregion
-
-        //#region Options
-
-        ///// <summary>
-        ///// The <see cref="Options" /> property's name.
-        ///// </summary>
-        //public const string OptionsPropertyName = "Options";
-
-        //private List<ConfigItemProperty> _Options;
-
-        ///// <summary>
-        ///// 表示当前字段的可选择项
-        ///// </summary>
-        //public List<ConfigItemProperty> Options
-        //{
-        //    get { return _Options; }
-
-        //    set
-        //    {
-        //        if (_Options == value) return;
-
-        //        _Options = value;
-        //        NotifyOfPropertyChange(OptionsPropertyName);
-        //    }
-        //}
-
-        //#endregion
-
-        #region Selected
-
-        /// <summary>
-        /// The <see cref="Selected" /> property's name.
-        /// </summary>
-        public const string SelectedPropertyName = "Selected";
-
-        private ConfigItemProperty _Selected;
-
-        /// <summary>
-        /// Selected
-        /// </summary>
-        public ConfigItemProperty Selected
-        {
-            get { return _Selected; }
-
-            set
-            {
-                if (_Selected == value) return;
-
-                _Selected = value;
-                if (value == null)
-                    Value = null;
-                else
-                    Value = _Selected.Value;
-                NotifyOfPropertyChange(SelectedPropertyName);
             }
         }
 
@@ -131,5 +75,36 @@ namespace GiantappConfiger.Models
 
         #endregion
 
+        #region AddItemCommand
+
+        private DelegateCommand _AddItemCommand;
+
+        /// <summary>
+        /// Gets the AddItemCommand.
+        /// </summary>
+        public DelegateCommand AddItemCommand
+        {
+            get
+            {
+                return _AddItemCommand ?? (_AddItemCommand = new DelegateCommand(ExecuteAddItemCommand));
+            }
+        }
+
+        private void ExecuteAddItemCommand()
+        {
+            if (Value == null)
+                return;
+
+            var type = Value.GetType();
+            bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ObservableCollection<>);
+            if (isList)
+            {
+                var itemType = Descriptor.SourceType.GetGenericArguments()[0];
+                var list = Value as ObservableCollection<object>;
+                list.Add(Activator.CreateInstance(itemType));
+            }
+        }
+
+        #endregion
     }
 }

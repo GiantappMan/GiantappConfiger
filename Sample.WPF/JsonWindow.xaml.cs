@@ -32,7 +32,6 @@ namespace Sample.WPF
             string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data\\Languages");
             LanService.Init(new JsonDB(path), true);
         }
-        readonly ConfigerService service = new ConfigerService();
         readonly string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.json");
         readonly string descPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Data", "test.desc.json");
         public JsonWindow()
@@ -59,13 +58,13 @@ namespace Sample.WPF
                     value = i
                 });
             }
-            configer.DataContext = service.GetVM(new object[] { data }, dataDesc);
+            configer.DataContext = ConfigerService.GetVM(new object[] { data }, dataDesc);
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var vm = configer.DataContext as ConfigerViewModel;
-            var data = service.GetData<Setting>(vm.Nodes);
+            var data = ConfigerService.GetData<Setting>(vm.Nodes);
             var setting = await JsonHelper.JsonSerializeAsync(data, path);
             Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(data.S3);
             await LanService.UpdateLanguage();

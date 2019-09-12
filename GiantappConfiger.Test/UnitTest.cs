@@ -55,7 +55,6 @@ namespace GiantappConfiger.Test
         [TestMethod]
         public void TestGetVM()
         {
-            ConfigerService service = new ConfigerService();
             TestSetting setting = new TestSetting()
             {
                 P1 = 1,
@@ -81,8 +80,7 @@ namespace GiantappConfiger.Test
                         }
                     }}
             };
-            //var vm = service.GetVM(setting, descriptor);
-            var vm = service.GetVM(new object[] { setting }, descriptor);
+            var vm = ConfigerService.GetVM(new object[] { setting }, descriptor);
             Assert.IsTrue(vm.Nodes.Count == 1);
             Assert.IsTrue(vm.Nodes[0].Selected);
             Assert.IsTrue(vm.Nodes[0].Properties.Count == 4);
@@ -94,7 +92,7 @@ namespace GiantappConfiger.Test
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[0].Descriptor.Text == "sub int property");
             Assert.IsTrue(vm.Nodes[0].SubNodes[0].Properties[1].Descriptor.Text == "sub string property");
 
-            var tmpList = service.GetAllData<TestSetting>(vm.Nodes);
+            var tmpList = ConfigerService.GetAllData<TestSetting>(vm.Nodes);
             Assert.IsTrue(tmpList[0].P1 == 1);
             Assert.IsTrue(tmpList[0].P2 == "xxx");
             Assert.IsTrue(tmpList[0].P3);
