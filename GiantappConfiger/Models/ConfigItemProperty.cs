@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace GiantappConfiger.Models
 {
@@ -101,7 +102,41 @@ namespace GiantappConfiger.Models
             {
                 var itemType = Descriptor.SourceType.GetGenericArguments()[0];
                 var list = Value as ObservableCollection<object>;
-                list.Add(Activator.CreateInstance(itemType));
+                var data = Activator.CreateInstance(itemType);
+                //把对象转化为property对象，xaml自动绑定对应模板
+                var vm = ConfigerService.GetNodes(new object[] { data }, null);
+                list.Add(vm[0].Properties);
+            }
+        }
+
+        #endregion
+
+        #region DeleteItemCommand 
+
+        private DelegateCommand<ObservableCollection<ConfigItemProperty>> _DeleteItemCommand;
+
+        /// <summary>
+        /// Gets the DeleteItemCommand.
+        /// </summary>
+        public DelegateCommand<ObservableCollection<ConfigItemProperty>> DeleteItemCommand
+        {
+            get
+            {
+                return _DeleteItemCommand ?? (_DeleteItemCommand = new DelegateCommand<ObservableCollection<ConfigItemProperty>>(ExecuteDeleteItemCommand));
+            }
+        }
+
+        private void ExecuteDeleteItemCommand(ObservableCollection<ConfigItemProperty> parameter)
+        {
+            if (Value == null)
+                return;
+
+            var type = Value.GetType();
+            bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ObservableCollection<>);
+            if (isList)
+            {
+                var list = Value as ObservableCollection<object>;
+                list.Remove(parameter);
             }
         }
 

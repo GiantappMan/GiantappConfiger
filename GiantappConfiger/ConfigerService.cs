@@ -65,7 +65,12 @@ namespace GiantappConfiger
             var result = new ExpandoObject() as IDictionary<string, object>;
             foreach (var propertyItem in nodeItem.Properties)
             {
-                result.Add(propertyItem.Descriptor.PropertyName, propertyItem.Value);
+                object tmpValue = propertyItem.Value;
+                //是列表对象
+                if (propertyItem.Value is ObservableCollection<object> listData)
+                    tmpValue = GetListData(listData);
+
+                result.Add(propertyItem.Descriptor.PropertyName, tmpValue);
             }
 
             if (nodeItem.SubNodes != null)
@@ -77,7 +82,22 @@ namespace GiantappConfiger
             return result;
         }
 
-        private static List<ConfigItemNode> GetNodes(object[] configs, DescriptorInfoDict descriptor)
+        private static object GetListData(ObservableCollection<object> listData)
+        {
+            List<object> list = new List<object>();
+            //一个对象的所有属性值
+            foreach (ObservableCollection<ConfigItemProperty> properties in listData)
+            {
+                var data = new ExpandoObject() as IDictionary<string, object>;
+                foreach (ConfigItemProperty p in properties)
+                    data.Add(p.Descriptor.PropertyName, p.Value);
+
+                list.Add(data);
+            }
+            return list;
+        }
+
+        internal static List<ConfigItemNode> GetNodes(object[] configs, DescriptorInfoDict descriptor)
         {
             List<ConfigItemNode> result = new List<ConfigItemNode>();
             foreach (var configItem in configs)
