@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace GiantappConfiger
 {
@@ -122,6 +123,8 @@ namespace GiantappConfiger
                 descInfo.SourceType = sourceType;
                 if (sourceType == typeof(TimeSpan))
                     descInfo.Type = PropertyType.TimeSpan;
+                if (sourceType == typeof(string))
+                    descInfo.Type = PropertyType.String;
 
                 if (IsList(sourceType))
                 {
@@ -149,9 +152,23 @@ namespace GiantappConfiger
                 var valueDescriptor = GetOrCreateDescriptorInfo(pType.Name, pType.PropertyType, descriptor.PropertyDescriptors);
                 if (isValue)
                 {
-                    if (value == null && IsList(pType.PropertyType))
+                    bool isList = IsList(pType.PropertyType);
+                    if (value == null && isList)
                     {
+                        //构造默认list
                         value = new ObservableCollection<object>();
+                    }
+                    else if (isList)
+                    {
+                        //list不为空，把原始数据转化为property对象
+                        var tmpList = value as IEnumerable;
+                        var listValue = new ObservableCollection<object>();
+                        foreach (var tmpData in tmpList)
+                        {
+                            var tmpVM = GetNode(tmpData, new DescriptorInfo());
+                            listValue.Add(tmpVM.Properties);
+                        }
+                        value = listValue;
                     }
                     var tmpP = new ConfigItemProperty()
                     {
