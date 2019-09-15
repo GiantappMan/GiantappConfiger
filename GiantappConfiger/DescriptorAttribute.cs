@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GiantappConfiger
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.All | AttributeTargets.Property)]
     public class DescriptorAttribute : Attribute
     {
         public string Text { get; set; }

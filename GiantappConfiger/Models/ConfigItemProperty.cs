@@ -8,6 +8,7 @@ namespace GiantappConfiger.Models
 {
     public enum PropertyType
     {
+        None,
         Integer,
         Float,
         String,

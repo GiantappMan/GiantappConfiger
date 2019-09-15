@@ -17,10 +17,11 @@ namespace GiantappConfiger
 {
     public static class ConfigerService
     {
-        public static ConfigerViewModel GetVM(object config, DescriptorInfoDict descriptor)
+        public static ConfigerViewModel GetVM(object config, DescriptorInfoDict descriptor = null)
         {
             return GetVM(new object[] { config }, descriptor);
         }
+
         public static ConfigerViewModel GetVM(object[] configs, DescriptorInfoDict descriptor)
         {
             var nodes = GetNodes(configs, descriptor);
@@ -104,14 +105,15 @@ namespace GiantappConfiger
             foreach (var configItem in configs)
             {
                 var type = configItem.GetType();
-                DescriptorInfo descInfo = GetOrCreateDescriptorInfo(type.Name, type, descriptor);
+                var attr = type.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute;
+                DescriptorInfo descInfo = GetOrCreateDescriptorInfo(type.Name, type, descriptor, attr);
                 var node = GetNode(configItem, descInfo);
                 result.Add(node);
             }
             return result;
         }
 
-        private static DescriptorInfo GetOrCreateDescriptorInfo(string key, Type sourceType, DescriptorInfoDict descriptor)
+        private static DescriptorInfo GetOrCreateDescriptorInfo(string key, Type sourceType, DescriptorInfoDict descriptor, DescriptorAttribute attr = null)
         {
             DescriptorInfo descInfo;
             if (descriptor != null && descriptor.ContainsKey(key))
@@ -119,20 +121,38 @@ namespace GiantappConfiger
             else
             {
                 //生成默认描述信息
-                descInfo = new DescriptorInfo() { Text = key };
-                descInfo.SourceType = sourceType;
-                if (sourceType == typeof(TimeSpan))
-                    descInfo.Type = PropertyType.TimeSpan;
-                if (sourceType == typeof(string))
-                    descInfo.Type = PropertyType.String;
-
-                if (IsList(sourceType))
+                descInfo = new DescriptorInfo()
                 {
-                    descInfo.Type = PropertyType.List;
+                    Text = key,
+                    SourceType = sourceType
+                };
+
+                if (attr != null)
+                {
+                    descInfo.Text = attr.Text;
+                    if (attr.Type != PropertyType.None)
+                        descInfo.Type = attr.Type;
+                    else
+                        descInfo.Type = GetDefaultType(sourceType);
+                }
+                else
+                {
+                    descInfo.Type = GetDefaultType(sourceType);
                 }
             }
             DescriptorInfo.SetPropertyName(key, descInfo);
             return descInfo;
+        }
+
+        private static PropertyType GetDefaultType(Type sourceType)
+        {
+            if (sourceType == typeof(TimeSpan))
+                return PropertyType.TimeSpan;
+            if (sourceType == typeof(string))
+                return PropertyType.String;
+            if (IsList(sourceType))
+                return PropertyType.List;
+            return PropertyType.String;
         }
 
         private static ConfigItemNode GetNode(object configItem, DescriptorInfo descriptor)
@@ -143,16 +163,18 @@ namespace GiantappConfiger
                 SubNodes = new ObservableCollection<ConfigItemNode>()
             };
 
-            var propertyTypes = configItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
-            foreach (var pType in propertyTypes)
+            var propertyInfos = configItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
+            foreach (var pInfo in propertyInfos)
             {
                 //property
-                var isValue = IsValue(pType.PropertyType);
-                var value = pType.GetValue(configItem);
-                var valueDescriptor = GetOrCreateDescriptorInfo(pType.Name, pType.PropertyType, descriptor.PropertyDescriptors);
+                var isValue = IsValue(pInfo.PropertyType);
+                var value = pInfo.GetValue(configItem);
+
+                var attr = pInfo.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute;
+                var valueDescriptor = GetOrCreateDescriptorInfo(pInfo.Name, pInfo.PropertyType, descriptor.PropertyDescriptors, attr);
                 if (isValue)
                 {
-                    bool isList = IsList(pType.PropertyType);
+                    bool isList = IsList(pInfo.PropertyType);
                     if (value == null && isList)
                     {
                         //构造默认list
@@ -183,7 +205,7 @@ namespace GiantappConfiger
                 {
                     //node
                     if (value == null)
-                        value = Activator.CreateInstance(pType.PropertyType);
+                        value = Activator.CreateInstance(pInfo.PropertyType);
                     var subPropertyTypes = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
                     var tmpNode = GetNode(value, valueDescriptor);
                     result.SubNodes.Add(tmpNode);
