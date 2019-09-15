@@ -80,7 +80,7 @@ namespace GiantappConfiger.Test
                         }
                     }}
             };
-            var vm = ConfigerService.GetVM(new object[] { setting }, descriptor);
+            var vm = ConfigerService.GetVM(setting, descriptor);
             Assert.IsTrue(vm.Nodes.Count == 1);
             Assert.IsTrue(vm.Nodes[0].Selected);
             Assert.IsTrue(vm.Nodes[0].Properties.Count == 4);
