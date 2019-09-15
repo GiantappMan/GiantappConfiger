@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GiantappConfiger.Views.Controls"
     xmlns:local="clr-namespace:GiantappConfiger"
     xmlns:rules="clr-namespace:GiantappConfiger.ValidationRules">
 
@@ -51,7 +52,7 @@
                 ToolTip="{Binding Converter={StaticResource DescConveter}}">
                 <Run Text=":" />
             </TextBlock>
-            <TextBox Grid.Column="1" Style="{StaticResource Element_Setting}">
+            <!--<TextBox Grid.Column="1" Style="{StaticResource Element_Setting}">
                 <Binding
                     Mode="TwoWay"
                     Path="Value"
@@ -60,7 +61,8 @@
                         <rules:TextBoxValidationRule LimitType="Interget" />
                     </Binding.ValidationRules>
                 </Binding>
-            </TextBox>
+            </TextBox>-->
+            <controls:NumericUpDown Grid.Column="1" NumValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
     </DataTemplate>
 

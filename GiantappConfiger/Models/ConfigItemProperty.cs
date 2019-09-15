@@ -43,6 +43,9 @@ namespace GiantappConfiger.Models
             {
                 if (_Value == value) return;
 
+                if (_Value + "" == value + "")
+                    return;
+
                 _Value = value;
                 NotifyOfPropertyChange(ValuePropertyName);
             }
