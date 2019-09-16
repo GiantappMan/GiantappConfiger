@@ -12,7 +12,14 @@ namespace GiantappConfiger
                 return null;
             }
 
-            string key = $"{cp.Descriptor.Type.ToString()}Editor";
+            string templateName = null;
+            if (cp.Descriptor.Type == PropertyType.None)
+                //默认模板
+                templateName = PropertyType.String.ToString();
+            else
+                templateName = cp.Descriptor.Type.ToString();
+
+            string key = $"{templateName}Editor";
             var template = ((FrameworkElement)container).FindResource(key) as DataTemplate;
             return template;
         }

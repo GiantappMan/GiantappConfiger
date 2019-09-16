@@ -237,8 +237,11 @@ namespace GiantappConfiger.Models
             }
         }
 
+        /// <summary>
+        /// 默认类型，用于list自动构造对象（不允许填，因为内部会自动生成）
+        /// </summary>
         public Type SourceType { get; internal set; }
 
-        #endregion
+        #endregion        
     }
 }

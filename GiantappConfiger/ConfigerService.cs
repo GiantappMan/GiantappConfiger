@@ -117,7 +117,11 @@ namespace GiantappConfiger
         {
             DescriptorInfo descInfo;
             if (descriptor != null && descriptor.ContainsKey(key))
+            {
                 descInfo = descriptor[key];
+                if (descInfo.SourceType == null)
+                    descInfo.SourceType = sourceType;
+            }
             else
             {
                 //生成默认描述信息
@@ -222,10 +226,12 @@ namespace GiantappConfiger
 
         private static bool IsValue(Type type)
         {
-            return type.IsPrimitive
+            var result = type.IsPrimitive
                 || type.Equals(typeof(string))
                 || type.Equals(typeof(TimeSpan))
+                || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
                 || IsList(type);
+            return result;
         }
 
         private static bool IsList(Type type)
