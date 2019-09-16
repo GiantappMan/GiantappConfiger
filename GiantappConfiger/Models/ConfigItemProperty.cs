@@ -10,6 +10,7 @@ namespace GiantappConfiger.Models
     {
         None,
         Integer,
+        Label,
         Float,
         String,
         Boolean,
@@ -79,7 +80,10 @@ namespace GiantappConfiger.Models
         }
 
         #endregion
+    }
 
+    public class ListItemProperty : ConfigItemProperty
+    {
         #region AddItemCommand
 
         private DelegateCommand _AddItemCommand;

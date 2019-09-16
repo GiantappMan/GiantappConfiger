@@ -3,8 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:GiantappConfiger.Views.Controls"
     xmlns:local="clr-namespace:GiantappConfiger"
+    xmlns:models="clr-namespace:GiantappConfiger.Models"
     xmlns:rules="clr-namespace:GiantappConfiger.ValidationRules">
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <local:TemplateSelector x:Key="TemplateSelector" />
     <local:TextConveter x:Key="NameConveter" />
     <local:TextConveter x:Key="DescConveter" ReadDesc="True" />
@@ -39,7 +41,27 @@
                 Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
     </DataTemplate>
-
+    <DataTemplate x:Key="LabelEditor">
+        <Grid Margin="0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="auto"
+                    MaxWidth="100"
+                    SharedSizeGroup="desc" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Style="{StaticResource TextBlock_Desc}"
+                Text="{Binding Converter={StaticResource NameConveter}}"
+                ToolTip="{Binding Converter={StaticResource DescConveter}}">
+                <!--<Run Text=":" />-->
+            </TextBlock>
+            <Label
+                Grid.Column="1"
+                Content="{Binding Value}"
+                Style="{StaticResource Element_Setting}" />
+        </Grid>
+    </DataTemplate>
     <DataTemplate x:Key="IntegerEditor">
         <Grid Margin="0,2">
             <Grid.ColumnDefinitions>
@@ -155,7 +177,7 @@
         </Grid>
     </DataTemplate>
 
-    <DataTemplate x:Key="ListEditor">
+    <DataTemplate x:Key="ListEditor" DataType="{x:Type models:ConfigItemProperty}">
         <Grid Margin="0,2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="100" SharedSizeGroup="desc" />
@@ -185,7 +207,8 @@
                                 Command="{Binding Parent.DataContext.DeleteItemCommand, ElementName=rootItemsControl}"
                                 CommandParameter="{Binding}"
                                 DockPanel.Dock="Right"
-                                Style="{StaticResource Btn_Operation}">
+                                Style="{StaticResource Btn_Operation}"
+                                Visibility="{Binding Parent.DataContext.Descriptor.CanRemoveItem, ElementName=rootItemsControl, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 x
                             </Button>
                             <ItemsControl
@@ -208,16 +231,10 @@
                 Grid.Column="2"
                 VerticalAlignment="Top"
                 Command="{Binding AddItemCommand}"
-                Style="{StaticResource Btn_Operation}">
+                Style="{StaticResource Btn_Operation}"
+                Visibility="{Binding Descriptor.CanAddItem, Converter={StaticResource BooleanToVisibilityConverter}}">
                 +
             </Button>
-            <!--<Button
-                Grid.Column="2"
-                VerticalAlignment="Top"
-                Command="{Binding DeleteItemCommand}"
-                CommandParameter="{Binding}"
-                Content="{Binding Value, Mode=OneWay}"
-                Style="{StaticResource Btn_Operation}" />-->
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

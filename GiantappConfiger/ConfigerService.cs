@@ -117,46 +117,37 @@ namespace GiantappConfiger
         {
             DescriptorInfo descInfo;
             if (descriptor != null && descriptor.ContainsKey(key))
-            {
                 descInfo = descriptor[key];
-                if (descInfo.SourceType == null)
-                    descInfo.SourceType = sourceType;
-            }
             else
-            {
                 //生成默认描述信息
-                descInfo = new DescriptorInfo()
-                {
-                    Text = key,
-                    SourceType = sourceType
-                };
+                descInfo = new DescriptorInfo();
 
-                if (attr != null)
-                {
-                    descInfo.Text = attr.Text;
-                    if (attr.Type != PropertyType.None)
-                        descInfo.Type = attr.Type;
-                    else
-                        descInfo.Type = GetDefaultType(sourceType);
-                }
-                else
-                {
-                    descInfo.Type = GetDefaultType(sourceType);
-                }
+            //定义了attribute
+            if (attr != null)
+            {
+                descInfo.Text = attr.Text;
+                descInfo.Type = attr.Type;
             }
+
+            //补充必填信息
+            if (string.IsNullOrEmpty(descInfo.Text))
+                descInfo.Text = key;
+
+            if (descInfo.Type == PropertyType.None)
+                descInfo.Type = GetDefaultType(sourceType);
+
+            if (descInfo.SourceType == null)
+                descInfo.SourceType = sourceType;
+
+            if (sourceType.IsEnum && descInfo.Options == null)
+            {
+                var items = sourceType.GetEnumNames();
+                var options = items.Select(m => new DescriptorInfo() { Text = m, DefaultValue = Enum.Parse(sourceType, m) });
+                descInfo.Options = new ObservableCollection<DescriptorInfo>(options);
+            }
+
             DescriptorInfo.SetPropertyName(key, descInfo);
             return descInfo;
-        }
-
-        private static PropertyType GetDefaultType(Type sourceType)
-        {
-            if (sourceType == typeof(TimeSpan))
-                return PropertyType.TimeSpan;
-            if (sourceType == typeof(string))
-                return PropertyType.String;
-            if (IsList(sourceType))
-                return PropertyType.List;
-            return PropertyType.String;
         }
 
         private static ConfigItemNode GetNode(object configItem, DescriptorInfo descriptor)
@@ -170,38 +161,31 @@ namespace GiantappConfiger
             var propertyInfos = configItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
             foreach (var pInfo in propertyInfos)
             {
-                //property
-                var isValue = IsValue(pInfo.PropertyType);
                 var value = pInfo.GetValue(configItem);
-
-                var attr = pInfo.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute;
-                var valueDescriptor = GetOrCreateDescriptorInfo(pInfo.Name, pInfo.PropertyType, descriptor.PropertyDescriptors, attr);
-                if (isValue)
+                var valueDescriptor = GetOrCreateDescriptorInfo(pInfo.Name, pInfo.PropertyType, descriptor.PropertyDescriptors,
+                    pInfo.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute);
+                if (IsValue(pInfo.PropertyType))
                 {
+                    //property
                     bool isList = IsList(pInfo.PropertyType);
                     if (value == null && isList)
-                    {
                         //构造默认list
-                        value = new ObservableCollection<object>();
-                    }
-                    else if (isList)
-                    {
-                        //list不为空，把原始数据转化为property对象
-                        var tmpList = value as IEnumerable;
-                        var listValue = new ObservableCollection<object>();
-                        foreach (var tmpData in tmpList)
-                        {
-                            var tmpVM = GetNode(tmpData, new DescriptorInfo());
-                            listValue.Add(tmpVM.Properties);
-                        }
-                        value = listValue;
-                    }
-                    var tmpP = new ConfigItemProperty()
-                    {
-                        Descriptor = valueDescriptor,
-                        Value = value
-                    };
-                    if (valueDescriptor.DefaultValue != null && value == null)
+                        value = valueDescriptor.DefaultValue ?? new ObservableCollection<object>();
+
+                    if (isList)
+                        value = ConvertToListValue(value, valueDescriptor);
+
+                    ConfigItemProperty tmpP = null;
+                    if (isList)
+                        tmpP = new ListItemProperty();
+                    else
+                        tmpP = new ConfigItemProperty();
+
+                    tmpP.Descriptor = valueDescriptor;
+                    tmpP.Value = value;
+
+                    if (value == null && valueDescriptor.DefaultValue != null)
+                        //没有值，就使用默认值
                         tmpP.Value = valueDescriptor.DefaultValue;
                     result.Properties.Add(tmpP);
                 }
@@ -224,16 +208,44 @@ namespace GiantappConfiger
             return result;
         }
 
+        private static object ConvertToListValue(object value, DescriptorInfo d)
+        {
+            //list不为空，把原始数据转化为property对象
+            var tmpList = value as IEnumerable;
+            var listValue = new ObservableCollection<object>();
+            foreach (var tmpData in tmpList)
+            {
+                var tmpVM = GetNode(tmpData, d);
+                listValue.Add(tmpVM.Properties);
+            }
+            return listValue;
+        }
+
         private static bool IsValue(Type type)
         {
             var result = type.IsPrimitive
                 || type.Equals(typeof(string))
                 || type.Equals(typeof(TimeSpan))
                 || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
-                || IsList(type);
+                || IsList(type)
+                || type.IsEnum;
             return result;
         }
+        private static PropertyType GetDefaultType(Type type)
+        {
+            if (type == typeof(TimeSpan))
+                return PropertyType.TimeSpan;
+            if (type == typeof(string))
+                return PropertyType.String;
+            if (IsList(type))
+                return PropertyType.List;
+            if (type.IsEnum)
+                return PropertyType.Combobox;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && type.GenericTypeArguments[0].IsEnum)
+                return PropertyType.Combobox;
 
+            return PropertyType.String;
+        }
         private static bool IsList(Type type)
         {
             bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);

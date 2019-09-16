@@ -242,6 +242,60 @@ namespace GiantappConfiger.Models
         /// </summary>
         public Type SourceType { get; internal set; }
 
+        #endregion
+
+        #region CanAddItem
+
+        /// <summary>
+        /// The <see cref="CanAddItem" /> property's name.
+        /// </summary>
+        public const string CanAddItemPropertyName = "CanAddItem";
+
+        private bool _CanAddItem = true;
+
+        /// <summary>
+        /// CanAddItem
+        /// </summary>
+        public bool CanAddItem
+        {
+            get { return _CanAddItem; }
+
+            set
+            {
+                if (_CanAddItem == value) return;
+
+                _CanAddItem = value;
+                NotifyOfPropertyChange(CanAddItemPropertyName);
+            }
+        }
+
+        #endregion
+
+        #region CanRemoveItem
+
+        /// <summary>
+        /// The <see cref="CanRemoveItem" /> property's name.
+        /// </summary>
+        public const string CanRemoveItemPropertyName = "CanRemoveItem";
+
+        private bool _CanRemoveItem = true;
+
+        /// <summary>
+        /// CanRemoveItem
+        /// </summary>
+        public bool CanRemoveItem
+        {
+            get { return _CanRemoveItem; }
+
+            set
+            {
+                if (_CanRemoveItem == value) return;
+
+                _CanRemoveItem = value;
+                NotifyOfPropertyChange(CanRemoveItemPropertyName);
+            }
+        }
+
         #endregion        
     }
 }
