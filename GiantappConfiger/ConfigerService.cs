@@ -223,25 +223,30 @@ namespace GiantappConfiger
 
         private static bool IsValue(Type type)
         {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                type = type.GenericTypeArguments[0];
+
             var result = type.IsPrimitive
-                || type.Equals(typeof(string))
-                || type.Equals(typeof(TimeSpan))
-                || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                || type == typeof(string)
+                || type == typeof(TimeSpan)
                 || IsList(type)
                 || type.IsEnum;
             return result;
         }
         private static PropertyType GetDefaultType(Type type)
         {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                type = type.GenericTypeArguments[0];
+
             if (type == typeof(TimeSpan))
                 return PropertyType.TimeSpan;
             if (type == typeof(string))
                 return PropertyType.String;
             if (IsList(type))
                 return PropertyType.List;
+            if (type == typeof(bool))
+                return PropertyType.Boolean;
             if (type.IsEnum)
-                return PropertyType.Combobox;
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && type.GenericTypeArguments[0].IsEnum)
                 return PropertyType.Combobox;
 
             return PropertyType.String;
