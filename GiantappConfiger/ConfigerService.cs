@@ -164,10 +164,9 @@ namespace GiantappConfiger
                 var value = pInfo.GetValue(configItem);
                 var valueDescriptor = GetOrCreateDescriptorInfo(pInfo.Name, pInfo.PropertyType, descriptor.PropertyDescriptors,
                     pInfo.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute);
-                if (IsValue(pInfo.PropertyType))
+                if (IsValue(pInfo.PropertyType, out bool isList))
                 {
                     //property
-                    bool isList = IsList(pInfo.PropertyType);
                     if (value == null && isList)
                         //构造默认list
                         value = valueDescriptor.DefaultValue ?? new ObservableCollection<object>();
@@ -221,7 +220,7 @@ namespace GiantappConfiger
             return listValue;
         }
 
-        private static bool IsValue(Type type)
+        private static bool IsValue(Type type, out bool isList)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                 type = type.GenericTypeArguments[0];
@@ -229,8 +228,12 @@ namespace GiantappConfiger
             var result = type.IsPrimitive
                 || type == typeof(string)
                 || type == typeof(TimeSpan)
-                || IsList(type)
                 || type.IsEnum;
+            isList = false;
+
+            if (!result)
+                isList = IsList(type);
+            result = result || isList;
             return result;
         }
         private static PropertyType GetDefaultType(Type type)
@@ -253,7 +256,11 @@ namespace GiantappConfiger
         }
         private static bool IsList(Type type)
         {
-            bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+            bool isList = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>) || type.IsSubclassOf(typeof(IList));
+            if (!isList && type.IsGenericType)
+            {
+                isList |= typeof(System.Collections.IList).IsAssignableFrom(type);
+            }
             return isList;
         }
 
