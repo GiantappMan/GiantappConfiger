@@ -161,6 +161,9 @@ namespace GiantappConfiger
             var propertyInfos = configItem.GetType().GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
             foreach (var pInfo in propertyInfos)
             {
+                var setter = pInfo.GetSetMethod();
+                if (setter == null)
+                    continue;
                 var value = pInfo.GetValue(configItem);
                 var valueDescriptor = GetOrCreateDescriptorInfo(pInfo.Name, pInfo.PropertyType, descriptor.PropertyDescriptors,
                     pInfo.GetCustomAttribute(typeof(DescriptorAttribute)) as DescriptorAttribute);
